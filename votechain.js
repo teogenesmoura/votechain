@@ -60,8 +60,8 @@ class Votechain{
     /* Entry point for external entities
        params: candidate and VoterID
        return: if sucessful returns last vote cast, else returns undefined */
-    castNewVote(candidate,VoterID)  {
-        var new_vote = this.generateNextVote(candidate.ID,VoterID);
+    castNewVote(candidate,voter)  {
+        var new_vote = this.generateNextVote(candidate.candidateID,voter.voterID);
         if (this.addVote(new_vote)) {
             return this.getLatestVote();
         } else {
