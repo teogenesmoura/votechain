@@ -1,11 +1,11 @@
 "use strict";
 var exports = module.exports = {};
+var u = require("./util.js");
 
 var Candidate = class Candidate{
 	constructor(name){
 		this.name = name;
-		this.politicalAffiliation = null;
-		this.ID = null;
+		this.ID = u.generate_publicID(name);
 	}
 	get name() {
 		return this._name;
@@ -21,13 +21,5 @@ var Candidate = class Candidate{
 	}
 }
 
-var newCandidate = (name) => {
-	var m_candidate = new Candidate(name);
-	return m_candidate;
-}
-
-exports.createCandidate = function(name){
-	var m_candidate = newCandidate(name);
-	return m_candidate;
-}
+module.exports = Candidate;
 

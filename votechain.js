@@ -43,12 +43,12 @@ class Votechain{
         }
         return false;
     }
-    generateNextVote(candidate,voterID) {
+    generateNextVote(candidateID,voterID) {
         var previousVote = this.getLatestVote();
         var nextIndex = previousVote.index + 1;
         var nextTimestamp = new Date().getTime() / 1000;
-        var nextHash = this.calculateHash(nextIndex, previousVote.hash, nextTimestamp, candidate, voterID);
-        return new Vote(nextIndex, previousVote.hash, nextTimestamp, candidate, voterID, nextHash);
+        var nextHash = this.calculateHash(nextIndex, previousVote.hash, nextTimestamp, candidateID, voterID);
+        return new Vote(nextIndex, previousVote.hash, nextTimestamp, candidateID, voterID, nextHash);
     }
     calculateHashForVote(vote)  {
         return this.calculateHash(vote.index, vote.previousHash, vote.timestamp, vote.candidate, vote.voterID);
@@ -61,7 +61,7 @@ class Votechain{
        params: candidate and VoterID
        return: if sucessful returns last vote cast, else returns undefined */
     castNewVote(candidate,VoterID)  {
-        var new_vote = this.generateNextVote(candidate,VoterID);
+        var new_vote = this.generateNextVote(candidate.ID,VoterID);
         if (this.addVote(new_vote)) {
             return this.getLatestVote();
         } else {

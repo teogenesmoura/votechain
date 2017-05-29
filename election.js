@@ -1,36 +1,32 @@
 /* Election defining file, uses the Decorator Design pattern */
 "use strict";
+var Votechain = require("./votechain.js");
 var Candidate = require("./candidate.js");
-var votechain = require("./votechain.js");
-var exports = module.exports = {};
 
 var Election = class Election {
 	constructor(name){
 		this.name = name;
 		this.candidates = [];
-		this.votechain = new votechain();
+		this.votes = new Votechain();
+	}	
+	get name(){
+		return this._name;
 	}
-	get candidateName(){
-		return this.name;
+	set name(name){
+		this._name = name;
 	}
-	set candidateName(name){
-		this.name = name;
-	}
-	get getCandidates() {
+	candidates() {
 	   	return this.candidates;
 	}
-	set addCandidates(name) {
-		var n_candidate = Candidate.createCandidate(name);
+	addCandidate(name) {
+		var n_candidate = new Candidate(name);
 		this.candidates.push(n_candidate);
+		return n_candidate;
 	}
-	castVote(candidate,VoterID) {
-		this.votechain.castNewVote(candidate,VoterID);
-	}
-	get votes() {
-		return this.votechain.allVotes;
+	castVote(candidate,voterID) {
+		this.votes.castNewVote(candidate,voterID);
 	}
 }
 
 module.exports = Election;
-
 
