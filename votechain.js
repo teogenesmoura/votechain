@@ -4,13 +4,19 @@ var exports = module.exports = {};
 var CryptoJS = require("crypto-js");
 
 class Vote {
-    constructor(index, previousHash, timestamp, candidate, voterID, hash) {
+    constructor(index, previousHash, timestamp, candidateID, voterID, hash) {
         this.index = index;
         this.previousHash = previousHash.toString();
         this.timestamp = timestamp;
-        this.candidate = candidate;
+        this.candidateID = candidateID;
         this.voterID = voterID;
         this.hash = hash.toString();
+    }
+    get getCandidateID() {
+        return this.candidateID;
+    }
+    get getVoterID() {
+        return this.voterID;
     }
 }
 
@@ -51,17 +57,17 @@ class Votechain{
         return new Vote(nextIndex, previousVote.hash, nextTimestamp, candidateID, voterID, nextHash);
     }
     calculateHashForVote(vote)  {
-        return this.calculateHash(vote.index, vote.previousHash, vote.timestamp, vote.candidate, vote.voterID);
+        return this.calculateHash(vote.index, vote.previousHash, vote.timestamp, vote.getCandidateID, vote.getVoterID);
     }
     /*TODO: refactor calculateHash into a Util class*/
-    calculateHash(index, previousHash, timestamp, candidate, voterID)   {
-        return CryptoJS.SHA256(index + previousHash + timestamp + candidate + voterID).toString();
+    calculateHash(index, previousHash, timestamp, candidateID, voterID)   {
+        return CryptoJS.SHA256(index + previousHash + timestamp + candidateID + voterID).toString();
     }
     /* Entry point for external entities
        params: candidate and VoterID
        return: if sucessful returns last vote cast, else returns undefined */
     castNewVote(candidate,voter)  {
-        var new_vote = this.generateNextVote(candidate.candidateID,voter.voterID);
+        var new_vote = this.generateNextVote(candidate.getCandidateID,voter.getVoterID);
         if (this.addVote(new_vote)) {
             return this.getLatestVote();
         } else {

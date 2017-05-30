@@ -27,6 +27,23 @@ var Election = class Election {
 		this.voters.push(new_voter);
 		return new_voter;
 	}
+
+	/*TODO: refactor the following 2 getters into 1 method;
+	place them possibly in User.js */
+	getCandidateNameByID(candidateID) {
+		for(var i = 0; i<this.candidates.length; i++) {
+			if(candidateID == this.candidates[i].getCandidateID){
+				return this.candidates[i].name;
+			}
+		}
+	}
+	getVoterNameByID(voterID) {
+		for (var i = 0; i<this.voters.length; i++) {
+			if(voterID == this.voters[i].getVoterID) {
+				return this.voters[i].name;
+			}
+		}
+	}
 	/* adds candidates to election: 
 	param: Voter instance
 	return: Voter with Candidate attributes if sucessful, else
@@ -36,8 +53,8 @@ var Election = class Election {
 		if(typeof voter === 'string') {
 			return "expects Voter Object";
 		}
-		for(var c in this.voters) {
-			if(voter.voterID === c.voterID)	{
+		for(var i = 0; i<this.voters.length;i++){
+			if(voter.getVoterID == this.voters[i].getVoterID) {
 				voter.setAsCandidate();
 				this.candidates.push(voter);
 				return this.candidates[this.candidates.length - 1];

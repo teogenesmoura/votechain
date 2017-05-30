@@ -10,6 +10,9 @@ class User {
 	set setName(name){
 		this.name = name;
 	}
+	get getName() {
+		return this.name;
+	}
 }
 class Voter extends User {
 	constructor(name) {
@@ -25,6 +28,9 @@ class Voter extends User {
 	}
 	get getCandidateID() {
 		return this.candidateID;
+	}
+	get getName() {
+		return super.getName;
 	}
 }
 
