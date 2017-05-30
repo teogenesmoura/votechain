@@ -29,7 +29,7 @@ var Election = class Election {
 	}
 
 	/*TODO: refactor the following 2 getters into 1 method;
-	place them possibly in User.js */
+	possibly place them in User.js */
 	getCandidateNameByID(candidateID) {
 		for(var i = 0; i<this.candidates.length; i++) {
 			if(candidateID == this.candidates[i].getCandidateID){
