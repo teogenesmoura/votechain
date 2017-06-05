@@ -1,15 +1,20 @@
 /* Election defining file, uses the Decorator Design pattern */
 "use strict";
 var Voter = require("./user.js");
+var u = require("./util.js");
 var votechain = require("./votechain.js");
 var exports = module.exports = {};
 
 var Election = class Election {
 	constructor(name){
+		this.ID = u.generatePublicID(name);
 		this.name = name;
 		this.voters = [];
 		this.candidates = [];
 		this.votechain = new votechain();
+	}
+	get getElectionID() {
+		return this.ID;
 	}
 	get getCandidates() {
 	   	return this.candidates;
