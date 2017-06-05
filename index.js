@@ -7,7 +7,7 @@ var initialPeers = process.env.PEERS ? process.env.PEERS.split(',') : [];
 
 var m_election = new Election();
 var voter_1 = m_election.addVoter("Voter 1");
-var voter_2 = m_election.addVoter("Voter 2");
+var voter_2 = m_election.addVoter("Voter s");
 var voter_3 = m_election.addVoter("Voter 3");
 var barack = m_election.addVoter("Barack Obama");
 var donald = m_election.addVoter("Donald Trump");
