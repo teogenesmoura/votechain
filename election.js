@@ -13,6 +13,9 @@ var Election = class Election {
 		this.candidates = [];
 		this.votechain = new votechain();
 	}
+	get getElectionName() {
+		return this.name;
+	}
 	get getElectionID() {
 		return this.ID;
 	}

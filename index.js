@@ -7,26 +7,69 @@ var bodyParser = require('body-parser');
 var http_port = process.env.HTTP_PORT || 3001;
 var p2p_port = process.env.P2P_PORT || 6001;
 var initialPeers = process.env.PEERS ? process.env.PEERS.split(',') : [];
-var election_list = [];
+var electionList = [];
 var port = 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/createElection', function(req,res) {
-	var temp_election = new Election(req.body.name);
-	election_list.push(temp_election);
-	res.send(JSON.stringify(temp_election.getElectionID));
+	if(typeof req.body.name !== 'string') {
+		res.send('election name should be string');
+	}
+	let temp_election = new Election(req.body.name);
+	electionList.push(temp_election);
+	console.log(JSON.stringify(temp_election));
+	res.send(JSON.stringify(temp_election));
 });
 
-app.get('/elections', function(req,res) {
-	res.send(JSON.stringify(election_list));
+app.get('/getElectionNameByID/:ID', function(req,res) {
+	if(typeof req.params.ID !== 'string') {
+		res.send('param should be string');
+	}
+	let electionRetrieved = electionList.find((e) => e.getElectionID === req.params.ID);
+	if(electionRetrieved != 'undefined') {
+		res.send(electionRetrieved.getElectionName);
+	}
+	res.send('nothing found');	
 });
 
-app.get('/', function(req,res) {
-	res.send('ack');
+// app.post('/createVoter', function(req,res) {
+// 	let election = getElection(req.body.name);
+// 	if (typeof election !== 'object') {
+// 		res.send('Election does not exist!');
+// 	}
+// });
+
+// app.post('/createCandidate', function(req,res) {
+
+// });
+
+// app.post('/castVote', function(req,res){
+
+// });
+
+// app.get('/election/:name', function(req,res) {
+// 	res.send(electionExists(req.params.name));
+// });
+
+// app.get('/elections', function(req,res) {
+// 	res.send(JSON.stringify(electionList));
+// });
+
+// app.get('/getElectionByID/:ID', function(req,res) {
+// 	if(electionList.find((e) => e.getElectionID === req.params.ID)) {
+// 		res.send(e.getElectionName);
+// 	}
+// });
+
+app.listen(port, function() {	
+	console.log("listening on port" + port);
 });
 
-app.listen(port);
+var electionExists = function(electionName) {
+	console.log(electionName);
+	return electionList.find((e) => e.getElectionName === electionName);
+}
 
 module.exports = app;
 // var m_election = new Election();

@@ -1,5 +1,5 @@
 process.env.NODE_ENV = 'test';
-
+let app = require('../index.js');
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 let server = require('../index.js');
@@ -12,9 +12,10 @@ describe('/POST election', () => {
 	it('it should return the ID of a new Election', (done) => {
 		chai.request(server)
 			.post('/createElection')
+			.field('name','testname')
 			.end((err, res) => {
 				res.should.have.status(200);
-				res.text.should.be.a('string');
+				res.body.should.be.a('object');
 			done();
 		});
 	});
