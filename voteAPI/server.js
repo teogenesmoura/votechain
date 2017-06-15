@@ -15,7 +15,6 @@ var MessageType = {
     RESPONSE_BLOCKCHAIN: 2
 };
 
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(require('./app/routes'));

@@ -19,10 +19,8 @@ router.route('/election')
 router.route('/voter')
 	  .post(voter.postVoter)
 	  .get(voter.getVoters);
+
 router.route('/voter/:name')
 	  .get(voter.getVoterByName);
-/* temporary router */
-router.route('/votechain')
-	  .post(votechain.initializeVoteChain)
-	  .get(votechain.getVoteChain);
+
 module.exports = router;

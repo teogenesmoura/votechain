@@ -1,13 +1,13 @@
 let votechain = require('./votechainController');
 let Election = require('../models/election');
+let Voter = require('../models/voter');
 
 function initializeElection(req, res) {
 	let election = new Election();
 	election.electionID = req.body.electionID;
 	election.name		= req.body.name;
 	election.voters		= null;
-	election.votechain  = votechain.initializeVoteChain;
-
+	election.votechain  = votechain.initializeVoteChain(req.body.electionID);
 	election.save(function(err) {
 		if(err) res.send(err);
 		res.json(election);
@@ -20,9 +20,8 @@ function getElection(req, res) {
 		res.send(elections);
 	}); 
 }
-
 function addVoterToElection(req, res) {
-	
+	let voter = Voter.findByName(req.body.name);
 }
-
 module.exports = { initializeElection, getElection };
+

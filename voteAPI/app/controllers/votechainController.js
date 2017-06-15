@@ -13,6 +13,28 @@ function getGenesisVote(electionID) {
 	voteController.postVoteObject(vote);
 	return vote;
 }
+
+function initializeVoteChain(electionID) {
+	let votechain = new Votechain();
+	votechain.electionID = electionID;
+	votechain.votes = [getGenesisVote(electionID)];
+	votechain.save(function(err) {
+		if(err) return err;
+		return votechain;
+	});
+	return votechain;
+}
+
+function getVoteChain(req, res) {
+	let query = Votechain.find({});
+	query.exec((err, votechain) => {
+		if(err) res.send(err);
+		res.json(votechain);
+	});
+}
+module.exports = { initializeVoteChain, getVoteChain }
+
+/* BACKUP METHODS 
 function initializeVoteChain(req,res) {
 	let votechain = new Votechain();
 	votechain.electionID = req.body.electionID;
@@ -22,11 +44,4 @@ function initializeVoteChain(req,res) {
 		res.json(votechain);
 	});
 }
-function getVoteChain(req, res) {
-	let query = Votechain.find({});
-	query.exec((err, votechain) => {
-		if(err) res.send(err);
-		res.json(votechain);
-	});
-}
-module.exports = { initializeVoteChain, getVoteChain }
+*/
