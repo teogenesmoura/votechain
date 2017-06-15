@@ -1,0 +1,3 @@
+ta salvando os IDs dos objetos de voto corretamente,
+mas salva uma referencia de objeto por entrada de votechain.
+O que precisa é um objeto de votechain guardando uma array de Vote. 

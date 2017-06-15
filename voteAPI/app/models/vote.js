@@ -2,9 +2,9 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
 let voteSchema = new Schema({
-	// index: Number,
-	// name: String,  
-	// previousHash: String,
+	index: Number,
+	previousHash: String,
+	hash: String,
 	voterID : String,
 	candidateID : String,
 	electionID	: String,

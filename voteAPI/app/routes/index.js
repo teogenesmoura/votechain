@@ -2,6 +2,8 @@ var express = require('express');
 var	router 	= express.Router();
 var vote = require('../controllers/voteController');
 var election = require('../controllers/electionController');
+var voter = require('../controllers/voterController');
+var votechain = require('../controllers/votechainController');
 
 router.route('/vote')
 	  .post(vote.postVote)
@@ -11,10 +13,16 @@ router.route('/vote/:electionID')
 	  .get(vote.getVotesByElectionID);
 
 router.route('/election')
-	  .post(election.postElection)
+	  .post(election.initializeElection)
 	  .get(election.getElection);
-// router.route('/election')
-// 	  .post(election.postElection)
-// 	  .get(election.getElection);
 
+router.route('/voter')
+	  .post(voter.postVoter)
+	  .get(voter.getVoters);
+router.route('/voter/:name')
+	  .get(voter.getVoterByName);
+/* temporary router */
+router.route('/votechain')
+	  .post(votechain.initializeVoteChain)
+	  .get(votechain.getVoteChain);
 module.exports = router;

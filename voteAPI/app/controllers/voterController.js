@@ -10,7 +10,7 @@ function postVoter(req, res) {
 	});
 }
 
-function getVoter(req,res) {
+function getVoters(req,res) {
 	let query = Voter.find({});
 	query.exec((err, voters) => {
 		if(err) res.send(err);
@@ -18,7 +18,10 @@ function getVoter(req,res) {
 	});
 }
 
-function findVoterByName(req, res) {
+function getVoterByName(req, res) {
+	console.log(req.params.name);
+	console.log(typeof req.params.name);
+	if(typeof req.params.name !== 'string') res.send('name should be string');
 	let query = Voter.find({ name: req.body.name });
 	query.exec((err, voter) => {
 		if(err) res.send(err);
@@ -26,4 +29,4 @@ function findVoterByName(req, res) {
 	})
 }
 
-module.exports = { postVoter, getVoter }
+module.exports = { postVoter, getVoters, getVoterByName }

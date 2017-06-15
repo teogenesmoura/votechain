@@ -17,7 +17,7 @@ function getVotes(req, res) {
 */
 
 function getVotesByElectionID(req, res) {
-	let query = Vote.find({ electionID: req.params.electionID});
+	let query = Vote.find({ electionID: req.params.electionID });
 	query.exec((err, votes) => {
 		if(err) res.send(err);
 		res.json(votes);
@@ -41,4 +41,11 @@ function postVote(req, res) {
 	});
 }
 
-module.exports = { postVote, getVotes, getVotesByElectionID };
+function postVoteObject(mVote) {
+	mVote.save(function(err) {
+		if(err) return err;
+		return mVote;
+	});
+}
+
+module.exports = { postVote, getVotes, getVotesByElectionID, postVoteObject };

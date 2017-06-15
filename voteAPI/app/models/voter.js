@@ -3,7 +3,7 @@ let Schema = mongoose.Schema;
 
 let voterSchema = new Schema({ 
 	name: 	String,
-	isCandidate:  Boolean 
+	isCandidate:  Boolean, 
 	createdAt: { type:Date, default: Date.now }
 });
 
