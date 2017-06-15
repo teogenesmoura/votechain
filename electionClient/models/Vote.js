@@ -10,3 +10,5 @@ var voteSchema = new Schema({
 	timestamp: String,
 	hash: String
 });
+
+var Vote = mongoose.model('Vote', voteSchema);
