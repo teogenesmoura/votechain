@@ -1,8 +1,11 @@
 let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 
-let voterSchema = new Schema({ 
-	name: 	String,
+var voterSchema = new Schema({ 
+	name: {
+		type: String,
+		required: true
+	},
 	isCandidate:  Boolean, 
 	createdAt: { type:Date, default: Date.now }
 });

@@ -2,7 +2,12 @@ DONE:
 
 NOT DONE:
 Adicionar Voter a uma eleicao criada	
-
+	-- NAIVE TESTING:
+	   - post request para criar voter
+	   - post request para adicionar voter a election
+	   - get request para listar eleicao
+	   - verificar se lista de voters inclui ID do voter inserido
+	   
 Adicionar voto a uma eleicao
 	-- deve vir de um Voter registrado pra aquela eleicao
 	-- o unico ponto de contato deve ser a electionController

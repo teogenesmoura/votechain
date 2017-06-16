@@ -16,6 +16,9 @@ router.route('/election')
 	  .post(election.initializeElection)
 	  .get(election.getElection);
 
+router.route('/election/addVoter')
+	  .post(election.addVoterToElection);
+
 router.route('/voter')
 	  .post(voter.postVoter)
 	  .get(voter.getVoters);

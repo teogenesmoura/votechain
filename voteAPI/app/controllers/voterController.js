@@ -29,4 +29,11 @@ function getVoterByName(req, res) {
 	})
 }
 
-module.exports = { postVoter, getVoters, getVoterByName }
+function localGetVoterByName(name){
+	let q = Voter.findOne({ 'name' : req.body.name });
+	let voter = q.exec((err, voter) => {
+		if(err) return (err);
+		return (voter);
+	});
+}
+module.exports = { postVoter, getVoters, getVoterByName, localGetVoterByName }

@@ -7,7 +7,7 @@ let voteSchema = new Schema({
 	hash: String,
 	voterID : String,
 	candidateID : String,
-	electionID	: String,
+	electionID	: { type: Schema.Types.ObjectId, ref: 'Election' },
 	timestamp	: String
 });
 
