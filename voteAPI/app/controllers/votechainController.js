@@ -1,30 +1,32 @@
 let Votechain = require('../models/votechain');
 let Vote      = require('../models/vote');
 let voteController = require('./voteController');
+let async = require('async');
 
-function getGenesisVote(electionID) {
+function getGenesisVote() {
 	let vote = new Vote();
 	vote.index = 0;
 	vote.previousHash = "0";
 	vote.timestamp = 1465154705;
 	vote.candidateID = 1;
-	vote.electionID = electionID;
 	vote.hash = "hashehmeupau";
 	voteController.postVoteObject(vote);
 	return vote;
 }
 
-function initializeVoteChain(electionID) {
+function initializeVoteChain() {
 	let votechain = new Votechain();
-	votechain.electionID = electionID;
-	votechain.votes = [getGenesisVote(electionID)];
+	votechain.votes = [getGenesisVote()];
 	votechain.save(function(err) {
 		if(err) return err;
 		return votechain;
 	});
 	return votechain;
 }
-
+/*
+* Gets all votechains in the db - testing purposes only
+* @returns error if an error occurs or a JSON doc with all votechains in it
+*/
 function getVoteChain(req, res) {
 	let query = Votechain.find({});
 	query.exec((err, votechain) => {
@@ -32,6 +34,9 @@ function getVoteChain(req, res) {
 		res.json(votechain);
 	});
 }
+/*
+* gets the Votechain object for a given election 
+* params
 module.exports = { initializeVoteChain, getVoteChain }
 
 /* BACKUP METHODS 
@@ -45,3 +50,5 @@ function initializeVoteChain(req,res) {
 	});
 }
 */
+
+module.exports = { getVoteChain, initializeVoteChain };

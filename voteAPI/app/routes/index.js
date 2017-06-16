@@ -19,6 +19,9 @@ router.route('/election')
 router.route('/election/addVoter')
 	  .post(election.addVoterToElection);
 
+router.route('/election/castVote')
+ 	  .post(election.castVoteToCandidateInElection);
+
 router.route('/voter')
 	  .post(voter.postVoter)
 	  .get(voter.getVoters);
@@ -26,4 +29,7 @@ router.route('/voter')
 router.route('/voter/:name')
 	  .get(voter.getVoterByName);
 
+router.route('/votechain')
+	  .get(votechain.getVoteChain);
+	  
 module.exports = router;

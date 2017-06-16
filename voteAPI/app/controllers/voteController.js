@@ -3,7 +3,6 @@ let Vote = require('../models/vote');
 /*
 * GET /vote route to retrieve all votes in all elections
 */
-
 function getVotes(req, res) {
 	let query = Vote.find({});
 	query.exec((err, votes) => {
@@ -48,4 +47,8 @@ function postVoteObject(mVote) {
 	});
 }
 
-module.exports = { postVote, getVotes, getVotesByElectionID, postVoteObject };
+function getNewVoteInstance() {
+	return new Vote();
+}
+
+module.exports = { postVote, getVotes, getVotesByElectionID, postVoteObject, getNewVoteInstance };
