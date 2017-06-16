@@ -66,35 +66,39 @@ function addVoterToElection(req, res) {
 }
 /*
 * Casts a vote to a candidate in a given election
-* @param {string} req.body.electionName - the name of the election receiving the vote
-* @param {string} req.body.voterName - the unique name of the voter who will cast the vote
-* @param {string} req.body.candidateID - the ID of the candidate casting the vote
+* @param {string} req.body.election - the name of the election receiving the vote
+* @param {string} req.body.voter - the unique name of the voter who will cast the vote
+* @param {string} req.body.candidate - the unique name of the candidate who will receive the vote
 * @returns error if an error occurs or the updated votechain for that election
 */
 function castVoteToCandidateInElection(req, res) {
 	async.parallel(
 	{
 		voter: function(callback) {
-			Voter.findOne({ 'name' : req.body.voterName }, function(err,voter) {
+			Voter.findOne({ 'name' : req.body.voter }, function(err,voter) {
 				callback(err, voter);
 			});
 		},
 		election: function(callback) {
-			Election.findOne({ 'name' : req.body.electionName }, function(err,election) {
+			Election.findOne({ 'name' : req.body.election }, function(err,election) {
 				callback(err, election);
+			});
+		},
+		candidate: function(callback) {
+			Voter.findOne({ 'name' : req.body.candidate }, function(err, candidate) {
+				callback(err, candidate);
 			});
 		} 
 	}, function(e, r) {
-		if(r.voter === null || r.election === null) {
-			res.send('Voter or Election not found');
-			console.log("chega aqui null");
+		if(r.voter === null || r.election === null || r.candidate === null) {
+			res.send('Voter,Election or Candidate not found');
 		} else {
 			let mVote = new Vote();
-			mVote.voterID = r.voter.id;
-			mVote.candidateID = req.body.candidateID;
+			mVote.voter = r.voter;
+			mVote.candidate = r.candidate;
 			mVote.save(function(err, mVote){
 				Votechain.findOneAndUpdate(
-					{ 'electionID' : r.election.id},
+					{ 'election' : r.election },
 					{ $push: { votes: mVote }},
 					{ new: true},
 					function(err, votechain) {

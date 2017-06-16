@@ -5,9 +5,9 @@ let voteSchema = new Schema({
 	index: Number,
 	previousHash: String,
 	hash: String,
-	voterID : String,
-	candidateID : String,
-	electionID	: { type: Schema.Types.ObjectId, ref: 'Election' },
+	voter       : { type: Schema.Types.ObjectId, ref: 'Voter'},
+	candidate	: { type: Schema.Types.ObjectId, ref: 'Voter'}, 
+	election	: { type: Schema.Types.ObjectId, ref: 'Election' },
 	timestamp	: String
 });
 
