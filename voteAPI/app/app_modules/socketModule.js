@@ -36,16 +36,10 @@ class socketModule {
 		});
 	}
 	responseLatestMsg() {
-		return {
-			'type': MessageType.RESPONSE_BLOCKCHAIN,
-			'data': JSON.stringify({})
-		}
+		return 'k';
 	}
 	responseChainMsg() {
-		return {
-			'type': MessageType.RESPONSE_BLOCKCHAIN,
-			'data': 
-		}
+		return 'k';
 	}
 	initConnection(ws) {
 		this.sockets.push(ws);
