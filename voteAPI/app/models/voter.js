@@ -6,8 +6,8 @@ var voterSchema = new Schema({
 		type: String,
 		required: true
 	},
-	isCandidate:  Boolean, 
-	createdAt: { type:Date, default: Date.now }
+	isCandidate:  Boolean,
+	createdAt: { type: Date, default: Date.now }
 });
 
 voterSchema.pre('save', next => {

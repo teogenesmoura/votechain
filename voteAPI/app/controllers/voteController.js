@@ -1,5 +1,4 @@
 let Vote = require('../models/vote');
-
 /*
 * GET /vote route to retrieve all votes in all elections
 */
@@ -10,11 +9,9 @@ function getVotes(req, res) {
 		res.json(votes);
 	});
 }
-
 /*
 * GET /vote/:electionID route to retrieve all votes in a given election
 */
-
 function getVotesByElectionID(req, res) {
 	let query = Vote.find({ electionID: req.params.electionID });
 	query.exec((err, votes) => {
@@ -22,11 +19,9 @@ function getVotesByElectionID(req, res) {
 		res.json(votes);
 	});
 }
-
 /*
 * POST /vote route to cast a new vote for a given election
 */
-
 function postVote(req, res) {
 	  	let vote = new Vote();
 	  	vote.voterID 	 = req.body.voterID;
@@ -39,14 +34,12 @@ function postVote(req, res) {
 		res.json({ vote });
 	});
 }
-
 function postVoteObject(mVote) {
 	mVote.save(function(err) {
 		if(err) return err;
 		return mVote;
 	});
 }
-
 function getNewVoteInstance() {
 	return new Vote();
 }

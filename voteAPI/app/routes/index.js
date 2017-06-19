@@ -4,6 +4,7 @@ var vote = require('../controllers/voteController');
 var election = require('../controllers/electionController');
 var voter = require('../controllers/voterController');
 var votechain = require('../controllers/votechainController');
+var socket = require('../controllers/socketController');
 
 router.route('/vote')
 	  .post(vote.postVote)
@@ -24,6 +25,7 @@ router.route('/election/castVote')
 
 router.route('/voter')
 	  .post(voter.postVoter)
+	  .put(voter.turnVoterIntoCandidate)
 	  .get(voter.getVoters);
 
 router.route('/voter/:name')
@@ -31,5 +33,8 @@ router.route('/voter/:name')
 
 router.route('/votechain')
 	  .get(votechain.getVoteChain);
-	  
+
+router.route('/addPeer')
+	  .post(socket.addPeer);
+
 module.exports = router;

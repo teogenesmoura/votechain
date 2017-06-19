@@ -9,7 +9,17 @@ function postVoter(req, res) {
 		res.send(voter);
 	});
 }
-
+function turnVoterIntoCandidate(req, res) {
+	let query = Voter.find({ 'name' : req.body.name });
+	query.exec((err, voter) => {
+		if(voter.isCandidate) voter.isCandidate = false;
+		if(!voter.isCandidate) voter.isCandidate = true;
+		voter.save(function(err,voter) {
+			if(err) res.send(err);
+			res.json(voter);
+		});
+	});
+}
 function getVoters(req,res) {
 	let query = Voter.find({});
 	query.exec((err, voters) => {
@@ -36,4 +46,4 @@ function localGetVoterByName(name){
 		return (voter);
 	});
 }
-module.exports = { postVoter, getVoters, getVoterByName, localGetVoterByName }
+module.exports = { postVoter, getVoters, getVoterByName, localGetVoterByName, turnVoterIntoCandidate }
