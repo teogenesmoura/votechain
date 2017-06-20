@@ -30,14 +30,13 @@ io.on('connection', function(socket){
 	socket.on('userAuth', function(data) {
 		console.log(data);
 	});
-	socket.on('castVote', function(election,candidate,voter) {
+	socket.on('castVote', function(obj) {
 		request.post(
 			'http://localhost:3000/election/castVote',
-			{ json: { election: election, candidate: candidate, voter: voter } },
+			{ json: { election: obj.election, candidate: obj.candidate, voter: obj.voter } },
 			function(error, response, body) {
 				if(!error && response.statusCode == 200) {
-					console.log(JSON.stringify(response));
-					//socket.emit('vote was cast', {voteInformation: response});
+					socket.emit('vote was cast', {voteInformation: response});
 				}
 			}
 		);
