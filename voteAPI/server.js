@@ -6,7 +6,21 @@ let mongoose   = require('mongoose');
 let request    = require('request');
 //let socketServer = require('./app/controllers/socketController');
 let port = process.env.PORT || 3000; 
-mongoose.connect('mongodb://localhost/vote');
+let rootURL = process.env.ROOT_URL || 'http://localhost:3000';
+/* 
+ * Mongoose by default sets the auto_reconnect option to true.
+ * We recommend setting socket options at both the server and replica set level.
+ * We recommend a 30 second connection timeout because it allows for 
+ * plenty of time in most operating environments.
+ */
+let options = { server: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } }, 
+                replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 } } };   
+
+/* mongodb://vote:vote@ds133582.mlab.com:33582/vote */
+let mongodbUri = 'mongodb://localhost:27017/vote';
+mongoose.connect(mongodbUri, options);
+let conn = mongoose.connection;             
+conn.on('error', console.error.bind(console, 'connection error:'));  
 
 var initialPeers = process.env.PEERS ? process.env.PEERS.split(',') : [];
 var sockets = [];
@@ -45,6 +59,7 @@ io.on('connection', function(socket){
 // let initP2PServer = () => {
 // 	socketServer.initP2PServer(initialPeers);
 // };
-
-initHttpServer();
+conn.once('open', function() {
+	initHttpServer();
+});
 // initP2PServer();
