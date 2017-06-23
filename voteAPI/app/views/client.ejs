@@ -1,0 +1,31 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+<script src="/config.js"></script>
+<script>
+  let election = 'eleicao1';
+  let candidate = 'George Bush';
+  let voter = 'Teogenes';
+  let ROOT_URL = 'http://localhost:3000';
+  var socket = io.connect(ROOT_URL);
+  socket.emit('userAuth', {voter: voter} );
+  socket.on('authenticated', function(response){
+    console.log(response);
+    socket.emit('castVote', { election: 'eleicao1', candidate: 'George Bush', voter: 'Teogenes'});
+  });
+  socket.on('vote was cast', function(vote) {
+      console.log(vote);
+  });
+  socket.on('unauthenticated', function(response){
+      console.log(response.message);
+  });
+ //  socket.on('userAuthResponse', function(response) {
+ //  	while(response !== 'authenticated') {
+ //  		socket.emit('userAuth', {voter: 'Teogenes' });
+ //  	}
+ //  	if(response == 'authenticated') {
+ //  		socket.emit('castVote', { election: 'eleicao1', candidate: 'George Bush', voter:'Teogenes'});
+ //  		socket.on('vote was cast', function(vote) {
+ //  			console.log(vote);
+ //  			});
+ //  		}
+	// });
+</script>

@@ -29,14 +29,15 @@ function getVoters(req,res) {
 }
 
 function getVoterByName(req, res) {
-	console.log(req.params.name);
-	console.log(typeof req.params.name);
-	if(typeof req.params.name !== 'string') res.send('name should be string');
-	let query = Voter.find({ name: req.body.name });
+	if(typeof req.params.name !== 'string'){
+		res.send('name should be string');	
+	} else {
+	let query = Voter.findOne({ name: req.params.name });
 	query.exec((err, voter) => {
 		if(err) res.send(err);
-		res.send(voter);
-	})
+			res.json(voter);
+		});
+	}
 }
 
 function localGetVoterByName(name){

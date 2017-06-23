@@ -5,12 +5,14 @@ Adicionar Voter a uma eleicao criada
 	   - post request para adicionar voter a election
 	   - get request para listar eleicao
 	   - verificar se lista de voters inclui ID do voter inserido
-	   
-NOT DONE:
+
 Adicionar voto a uma eleicao
 	-- deve vir de um Voter registrado pra aquela eleicao
 	-- o unico ponto de contato deve ser a electionController
 	-- voto deve ser persistido para a votechain atrelada a eleicao
+
+NOT DONE:
+	-- subir para o heroku e fazer o teste da API a distância
 
 Adicionar testes para:
 	-- criar uma eleicao que contenha ID, nome e votechain
