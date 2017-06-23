@@ -37,4 +37,15 @@ router.route('/votechain')
 router.route('/addPeer')
 	  .post(socket.addPeer);
 
+router.route('/client')
+	  .get(function(req,res) {
+	  		res.render('client', {ROOT_URL: process.env.ROOT_URL });
+		});
+
+router.route('/config.js')
+	  .get(function(req, res){
+   			res.send("var ROOT_='"+process.env.ROOT_URL+"'" + '\n');
+		});
+
+router.route
 module.exports = router;

@@ -14,7 +14,7 @@ function initializeElection(req, res) {
 	votechain.save(function(err) {
 		election.name		= req.body.name;
 		election.voters		= [];
-		election.votechain  = votechain;
+		election.votechain  = votechain.id;
 		election.save(function(err) {
 			if(err) res.send(err);
 			res.json(election);
