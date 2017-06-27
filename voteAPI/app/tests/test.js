@@ -74,7 +74,6 @@ describe('get Votes', () => {
             done();
           }); 
     });
-
 });
 
 
