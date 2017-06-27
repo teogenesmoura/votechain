@@ -1,0 +1,3 @@
+{
+    "DBHost": "mongodb://vote:vote@ds133582.mlab.com:33582/vote"
+}
