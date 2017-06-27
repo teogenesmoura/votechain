@@ -1,0 +1,32 @@
+DONE:
+Adicionar Voter a uma eleicao criada	
+	-- NAIVE TESTING:
+	   - post request para criar voter
+	   - post request para adicionar voter a election
+	   - get request para listar eleicao
+	   - verificar se lista de voters inclui ID do voter inserido
+
+Adicionar voto a uma eleicao
+	-- deve vir de um Voter registrado pra aquela eleicao
+	-- o unico ponto de contato deve ser a electionController
+	-- voto deve ser persistido para a votechain atrelada a eleicao
+
+NOT DONE:
+	-- subir para o heroku e fazer o teste da API a distância
+
+Adicionar testes para:
+	-- criar uma eleicao que contenha ID, nome e votechain
+		-- puxar a o ID da ultima votechain criada e checar contra o id da votechain da ultima eleicao criada
+		NAIVE TEST: 		UNIT TEST:
+
+	-- criar um Voter, adiciona-lo à eleição
+		NAIVE TEST:			UNIT TEST:
+
+	-- adicionar múltiplos votos à eleição, vindo de vários eleitores
+		NAIVE TEST:			UNIT TEST:
+
+	-- adicionar votos por P2P pelo terminal na máquina virtual
+		NAIVE TEST:			UNIT TEST:
+
+Na criação de novas entidades (Voter, Election), checar se nome já existe e retornar erro
+caso já exista

@@ -1,14 +1,27 @@
 let Vote = require('../models/vote');
+let async = require('async');
+
 /*
 * GET /vote route to retrieve all votes in all elections
 */
 function getVotes(req, res) {
-	let query = Vote.find({});
-	query.exec((err, votes) => {
-		if(err) res.send(err);
-		res.json(votes);
+	async.parallel(
+	{
+		votes: function(callback) {
+			Vote.find({}, function(err, votes) {
+				callback(err, votes);
+			});
+		}
+	},
+	function(e, r) {
+		if(e){
+			res.send(e);
+		} else {
+			res.send(r.votes);
+		}
 	});
 }
+
 /*
 * GET /vote/:electionID route to retrieve all votes in a given election
 */
