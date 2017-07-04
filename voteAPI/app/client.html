@@ -1,32 +1,30 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
-<script src="/config.js"></script>
 <script>
-  let election = 'eleicao1';
-  let candidate = 'George Bush';
-  let voter = 'Teogenes';
-  var socket = io.connect(ROOT_URL);
-  socket.emit('userAuth', {voter: voter} );
-  socket.on('authenticated', function(response){
-    // socket.emit('castVote', {election: election, candidate: candidate, voter: voter }, function(voteWasCast) {
-    //     if(voteWasCast) {
-    //       console.log("vote was correctly cast!");
-    //     } else {
-    //       console.log("voting procedure wasn't sucessfull");
-    //     }
-    // });
+  let mElection = "BRGeneralElection";
+  var socket = io.connect('http://localhost:3000');
+  // this.socket.on("connect", function() {
+  //   console.log("connected");
+  // });
+  this.socket.on("disconnect", function() {
+    console.log("disconnect");
   });
-  socket.on('unauthenticated', function(response){
-      console.log(response.message);
+  this.socket.on("connect_failed", function() {
+    console.log("connection failed");
   });
- //  socket.on('userAuthResponse', function(response) {
- //  	while(response !== 'authenticated') {
- //  		socket.emit('userAuth', {voter: 'Teogenes' });
- //  	}
- //  	if(response == 'authenticated') {
- //  		socket.emit('castVote', { election: 'eleicao1', candidate: 'George Bush', voter:'Teogenes'});
- //  		socket.on('vote was cast', function(vote) {
- //  			console.log(vote);
- //  			});
- //  		}
-	// });
+  socket.on('connected', function(response){
+    console.log(response.message);
+    socket.emit('joinElection', { electionRequested: mElection});
+  });
+  socket.on('election was not found', function(obj) {
+    console.log('election was not found');
+  });
+  socket.on('connected to election', function(obj) {
+    console.log(obj.message);
+  });
+  // socket.on('authenticated', function(response) {
+  //   socket.emit('castVote', { election: 'eleicao1', candidate: 'George Bush', voter:'Teogenes'});
+  //   socket.on('vote was cast', function(vote) {
+  //       console.log(vote);
+  // //   });
+  // });   
 </script>

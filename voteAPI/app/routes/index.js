@@ -4,7 +4,6 @@ var vote = require('../controllers/voteController');
 var election = require('../controllers/electionController');
 var voter = require('../controllers/voterController');
 var votechain = require('../controllers/votechainController');
-var socket = require('../controllers/socketController');
 
 router.route('/vote')
 	  .post(vote.postVote)
@@ -16,6 +15,9 @@ router.route('/vote/:electionID')
 router.route('/election')
 	  .post(election.initializeElection)
 	  .get(election.getElection);
+
+router.route('/election/:electionName')
+	  .get(election.getElectionByName);
 
 router.route('/election/addVoter')
 	  .post(election.addVoterToElection);
@@ -34,18 +36,9 @@ router.route('/voter/:name')
 router.route('/votechain')
 	  .get(votechain.getVoteChain);
 
-router.route('/addPeer')
-	  .post(socket.addPeer);
-
 router.route('/client')
 	  .get(function(req,res) {
 	  		res.render('client', {ROOT_URL: process.env.ROOT_URL });
 		});
 
-router.route('/config.js')
-	  .get(function(req, res){
-   			res.send("var ROOT_='"+process.env.ROOT_URL+"'" + '\n');
-		});
-
-router.route
 module.exports = router;

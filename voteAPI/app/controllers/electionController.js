@@ -7,6 +7,10 @@ let voteController = require('./voteController');
 let voterController = require('./voterController');
 let async = require('async');
 
+
+/** initializes an election
+* @returns JSON document with the election created or error
+*/
 function initializeElection(req, res) {
 	let election = new Election();
 	let votechain = new Votechain();
@@ -20,6 +24,28 @@ function initializeElection(req, res) {
 			res.json(election);
 		});
 	});
+}
+
+/** Retrieve election by name
+* @params: electionName
+* @returns: election JSON object if election exists, 'election not found' otherwise
+*/
+function getElectionByName(req, res) {
+	async.parallel(
+		{
+			election: function(callback) {
+				Election.findOne({'name' : req.params.electionName }, function(err,election) {
+					callback(err, election);
+				});
+			}
+		},
+		function(e, r) {
+			if(r.election == null) {
+				res.send('election not found');
+			} else { 
+				res.json(r.election);
+			}
+		});
 }
 /**
 * Retrieves all elections
@@ -118,7 +144,8 @@ function castVoteToCandidateInElection(req, res) {
 */
 function getVotechainFromElection(req, res) {
 	let electionID = req.body.electionID;
-
 }
-module.exports = { initializeElection, getElection, addVoterToElection, castVoteToCandidateInElection };
+module.exports = { initializeElection, getElection,
+									 addVoterToElection, castVoteToCandidateInElection,
+									 getElectionByName };
 
