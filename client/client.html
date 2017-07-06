@@ -1,0 +1,32 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+<script type="text/babel">
+  import { vote } from "./vote.js";
+  import { Votechain } from "./votechain.js";
+</script>
+<script>
+  let mElection = "BRGeneralElection";
+  var socket = io.connect('http://localhost:3000');
+  this.socket.on("disconnect", function() {
+    console.log("disconnect");
+  });
+  this.socket.on("connect_failed", function() {
+    console.log("connection failed");
+  });
+  socket.on('connected', function(response){
+    console.log(response.message);
+    socket.emit('joinElection', { electionRequested: mElection});
+  });
+  socket.on('election was not found', function(obj) {
+    console.log('election was not found');
+  });
+  socket.on('connected to election', function(obj) {
+    console.log(obj.message);
+  });
+  // socket.on('authenticated', function(response) {
+  //   socket.emit('castVote', { election: 'eleicao1', candidate: 'George Bush', voter:'Teogenes'});
+  //   socket.on('vote was cast', function(vote) {
+  //       console.log(vote);
+  // //   });
+  // });   
+</script>
