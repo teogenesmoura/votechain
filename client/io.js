@@ -1,8 +1,13 @@
-var Election = require('../controllers/electionController');
-var request  = require('request');
+let Election = require('../controllers/electionController');
+let request  = require('request');
+let async	   = require('async');
 let port 		 =  3000 || process.env.PORT;
-var ROOT_URL = 'http://localhost:' + port; 
-
+let ROOT_URL = 'http://localhost:' + port; 
+let currentVotechain = [{"voterID": "595fe92cef29084d1cc8d6a2", "candidateID": 1}, {"voterID": "5955c91b8d8840b9049ab14d", "candidateID": 2}, {"voterID": "595a94e2dbd111fe1e8b4ac9", "candidateID":1}];
+let currentVoteToValidate;
+let currentNumberOfConnectedClients = 0;
+let currentNumberOfValidatedVotes = 0;
+let peersThatNeedToValidateVote;
 /**
 * Initiates a connection between the socket and the server.
 * Current connection methods:
@@ -11,41 +16,99 @@ var ROOT_URL = 'http://localhost:' + port;
 *  @returns: connects socket to election room or sends error message
 *  socket.on('joinElection');
 */
-module.exports = function(server){
-	var io 			 = require('socket.io')(server);
-	console.log('entra aqui server');
-	server.on('connect', function(socket){ 
+
+/*
+* Current protocol:
+* Client connects -> Server emit 'connected'
+* Client on 'join election' -> Server emits 'connected to election'
+* Client on 'validateVote'  -> Server emits 'isVoteValid' OR 'Election does not exist'
+*/
+
+module.exports = function(io){
+	io.on('connection', function(socket){ 
+		currentNumberOfConnectedClients++;
+		console.log("number of connected clients " + currentNumberOfConnectedClients);
+
 		socket.emit('connected', { message: "you're connected" });
+
 		socket.on('joinElection', function(obj) {
 			if(obj === null) { socket.emit('obj was null'); } 
 			else {
 				let requestURL = ROOT_URL + '/election/' + obj.electionRequested;
 				request.get(requestURL, function(err, res, body) {
 					if(!err && res.statusCode == 200 && res.body !== '[]'){
-							/* joins the channel of a specific election */
-							socket.join(obj.electionRequested, (err) => {
-						 	if(err){
-						 		console.log(err);
-						 	} else {
-								let number_of_peers_in_election = io.of(obj.electionRequested).clients((error,clients) => {
-									if(error) throw error;
-									console.log(clients.length);
-									return clients.length;
-								});
-								socket.emit('connected to election', { message: 'socket' + socket.id + 'joined election' + obj.electionRequested, number_of_peers_in_election });
+						async.parallel(
+							{
+								joinRoom: function(callback) {
+									socket.join(obj.electionRequested, () => {
+										let rooms = Object.keys(socket.rooms);
+										console.log(rooms);
+										callback(rooms);
+									});
+								}, function(e, r) {
+									socket.emit("connected to election", { message: 'socket ' + socket.id + ' joined election ' + obj.electionRequested });
 							}
-						});
-					} else {
-						socket.emit('not connected to election', { message: "it wasn't possible to connect to the election given" });
+						});						
 					}
 				});
 			}
-		});    
-    socket.on('retrieveVotechain', function(obj) {
-    	
-    });
+		});
+
+	  socket.on("validateVote", function(obj){
+	  	  let electionRequested = obj.electionToRetrieveVotechain;
+	  	  console.log(electionRequested);
+	  	  console.log("Object keys em validate vote: \n");
+	  	  console.log(Object.keys(socket.rooms));
+	  	  if(electionRequested in Object.keys(socket.rooms)){
+	  	  	console.log("entrou aqui");
+	  	  }
+	  		//console.log(io.sockets.sockets);
+	  		//let roomCorrespondingToElectionRequested = io.sockets.adapter);
+	  		//console.log(roomCorrespondingToElectionRequested);
+	  		//let peersThatNeedToValidateVote = Object.keys(socket.rooms);
+	  		//console.log(peersThatNeedToValidateVote);
+	  		// for(peer in connectedPeers) {
+	  		//  	socket.to(peer).emit("isVoteValid", {voteToValidate: currentVoteToValidate});
+	  		// }
+		});
+
+		socket.on("getCurrentVotechain", function(obj){
+			let votechainReceived = obj.clientCurrentVotechain;
+
+			if(votechainReceived === currentVotechain) {
+				socket.emit("VotechainUpToDate");
+			}
+			if(votechainReceived.length < currentVotechain.length) {	
+				socket.emit("ServerSendsVotechainToClient", { currentVotechain: currentVotechain });
+			}
+			if(votechainReceived.length > currentVotechain.length) {
+				socket.emit("VotechainReceivedLongerThanCurrentVotechain");
+			}
+		});
+
+		socket.on("voteValidationStatus", function(obj){
+			if(obj.isVoteValid === true) {
+				console.log("socket that confirmed vote has id :" + socket.id + "\n");
+				console.log("the list of peers that need to confirm vote is: " + peersThatNeedToValidateVote);
+			}
+		});
+
+		socket.on("forceGetCurrentVotechain", function(obj){
+			socket.emit("currentStateOfVotechainOnServer", {currentVotechain: currentVotechain });
+		});	
+	
+		socket.on('disconnect', function(socket){
+			console.log("socket " + socket.id + "disconnected\n");
+			currentNumberOfConnectedClients--;
+			console.log("number of connected clients: " + currentNumberOfConnectedClients);
+		});
 	});
 }
+
+
+
+
+
 
 // io.on('connection', function(socket){
 // 	socket.on('userAuth', function(obj) {

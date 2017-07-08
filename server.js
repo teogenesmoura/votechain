@@ -1,14 +1,14 @@
 let app        = require('express')();
 let server     = require('http').Server(app);
-let socketIO   = require('socket.io')(server);    
-let io 		   = require('./client/io.js')(socketIO);      
+let io         = require('socket.io')(server);    
+let modularIo  = require('./client/io.js')(io);      
 let bodyParser = require('body-parser');
 let mongoose   = require('mongoose');
 let path 	   = require('path');
 let port 	   = process.env.PORT || 3000; 
 let ROOT_URL   = process.env.ROOT_URL || 'http://localhost:3000/';
 
-app.set('views', path.join(__dirname, './views'));
+app.set('views', path.join(__dirname, './client'));
 app.set('view engine', 'ejs');
 /* 
  * Mongoose by default sets the auto_reconnect option to true.
@@ -28,9 +28,9 @@ let initHttpServer = () => {
 	app.use(bodyParser.urlencoded({ extended: true }));
 	app.use(bodyParser.json());
 	app.use(require('./routes'));
+	app.get('/', (req,res) => { res.render('index'); });
 	server.listen(port, function() {
 		console.log('express listening on port' + port);
-		console.log('a user connected');
 	});
 	return app;
 }
