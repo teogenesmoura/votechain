@@ -4,7 +4,7 @@ let async	   = require('async');
 let port 		 =  3000 || process.env.PORT;
 let ROOT_URL = 'http://localhost:' + port; 
 let currentVotechain = [{"voterID": "595fe92cef29084d1cc8d6a2", "candidateID": 1}, {"voterID": "5955c91b8d8840b9049ab14d", "candidateID": 2}, {"voterID": "595a94e2dbd111fe1e8b4ac9", "candidateID":1}];
-let currentVoteToValidate;
+let currentVoteToValidate = { "voterID": "595fe92cef29084d1cc8d6a2", "candidateID": 1 };
 let currentNumberOfConnectedClients = 0;
 let currentNumberOfValidatedVotes = 0;
 let peersThatNeedToValidateVote;
@@ -52,23 +52,24 @@ module.exports = function(io){
 				});
 			}
 		});
-
+	  /**
+	  * returns a candidate vote and queries all clients connected to an election to validate that vote
+	  **/
 	  socket.on("validateVote", function(obj){
 	  	  let electionRequested = obj.electionToRetrieveVotechain;
-	  	  console.log(electionRequested);
-	  	  console.log("Object keys em validate vote: \n");
-	  	  console.log(Object.keys(socket.rooms));
-	  	  if(electionRequested in Object.keys(socket.rooms)){
-	  	  	console.log("entrou aqui");
+	  	  let electionExists = false;
+	  	  Object.keys(socket.rooms).forEach(function(key) {
+  			if(electionRequested === key) {
+  				electionExists = true;
+  				}
+			});
+	  	  if(electionExists) {
+	  	  	var connectedClients = io.sockets.adapter.rooms[electionRequested].sockets;
+	  	  	for(client in connectedClients) {
+	  	  		console.log("chega aqui com client:" + client);
+	  	  		io.to(client).emit("isVoteValid", {voteToValidate: currentVoteToValidate});
+	  	  	}
 	  	  }
-	  		// console.log(io.sockets.sockets);
-	  		// let roomCorrespondingToElectionRequested = io.sockets.adapter;
-	  		// console.log(roomCorrespondingToElectionRequested);
-	  		// let peersThatNeedToValidateVote = Object.keys(socket.rooms);
-	  		// console.log(peersThatNeedToValidateVote);
-	  		// for(peer in peersThatNeedToValidateVote) {
-	  		//  	socket.to(peer).emit("isVoteValid", {voteToValidate: currentVoteToValidate});
-	  		// }
 		});
 
 		socket.on("getCurrentVotechain", function(obj){

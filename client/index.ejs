@@ -66,7 +66,8 @@
   /* inserting a vote into the votechain */
 
   socket.on("isVoteValid", function(obj) {
-    //TODO: add more clauses to determine if vote is valid or not 
+  	console.log("chega aqui");
+  	console.log(JSON.stringify(obj));
     if(obj !== null){
       socket.emit("voteValidationStatus", {isVoteValid: true });
     }
