@@ -23,7 +23,6 @@ let peersThatNeedToValidateVote;
 * Client on 'join election' -> Server emits 'connected to election'
 * Client on 'validateVote'  -> Server emits 'isVoteValid' OR 'Election does not exist'
 */
-
 module.exports = function(io){
 	io.on('connection', function(socket){ 
 		currentNumberOfConnectedClients++;
@@ -62,12 +61,12 @@ module.exports = function(io){
 	  	  if(electionRequested in Object.keys(socket.rooms)){
 	  	  	console.log("entrou aqui");
 	  	  }
-	  		//console.log(io.sockets.sockets);
-	  		//let roomCorrespondingToElectionRequested = io.sockets.adapter);
-	  		//console.log(roomCorrespondingToElectionRequested);
-	  		//let peersThatNeedToValidateVote = Object.keys(socket.rooms);
-	  		//console.log(peersThatNeedToValidateVote);
-	  		// for(peer in connectedPeers) {
+	  		// console.log(io.sockets.sockets);
+	  		// let roomCorrespondingToElectionRequested = io.sockets.adapter;
+	  		// console.log(roomCorrespondingToElectionRequested);
+	  		// let peersThatNeedToValidateVote = Object.keys(socket.rooms);
+	  		// console.log(peersThatNeedToValidateVote);
+	  		// for(peer in peersThatNeedToValidateVote) {
 	  		//  	socket.to(peer).emit("isVoteValid", {voteToValidate: currentVoteToValidate});
 	  		// }
 		});

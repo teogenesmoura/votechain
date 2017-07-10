@@ -7,7 +7,6 @@
   let mElection = "BRGeneralElection";
   let socket = io.connect('http://localhost:3000');
   let voteToInsert = {"voterID": "595fe92cef29084d1cc8d6a2", "candidateID": 1};
-
   /* connection establishment and votechain sync */
   socket.on("connected", function(response) {
     console.log(response.message);
@@ -28,7 +27,6 @@
     if(obj.currentVotechain !== null) {
       votechain = obj.currentVotechain;
       console.log("updated votechain is: " + JSON.stringify(votechain));
-      validateVote();
     } else {
       console.log('currentVotechain object was null');
     }
@@ -59,16 +57,4 @@
   socket.on("election was not found", function(obj) {
     console.log('election was not found');
   });   
-
-  let validateVote = function(){ 
-  	  socket.emit("validateVote", { voteToValidate: voteToInsert, electionToRetrieveVotechain: mElection });
-  }
-  /* inserting a vote into the votechain */
-
-  socket.on("isVoteValid", function(obj) {
-    //TODO: add more clauses to determine if vote is valid or not 
-    if(obj !== null){
-      socket.emit("voteValidationStatus", {isVoteValid: true });
-    }
-  });
 </script>
