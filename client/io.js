@@ -7,7 +7,9 @@ let currentVotechain = [{"voterID": "595fe92cef29084d1cc8d6a2", "candidateID": 1
 let currentVoteToValidate = { "voterID": "595fe92cef29084d1cc8d6a2", "candidateID": 1 };
 let currentNumberOfConnectedClients = 0;
 let currentNumberOfValidatedVotes = 0;
-let peersThatNeedToValidateVote;
+var { linkedList } = require('./LinkedList');
+var nodesThatNeedToValidateVote = new linkedList();
+
 /**
 * Initiates a connection between the socket and the server.
 * Current connection methods:
@@ -57,6 +59,7 @@ module.exports = function(io){
 	  **/
 	  socket.on("validateVote", function(obj){
 	  	  let electionRequested = obj.electionToRetrieveVotechain;
+	  	  let voteToValidate = obj.voteToValidate;
 	  	  let electionExists = false;
 	  	  Object.keys(socket.rooms).forEach(function(key) {
   			if(electionRequested === key) {
@@ -66,7 +69,7 @@ module.exports = function(io){
 	  	  if(electionExists) {
 	  	  	var connectedClients = io.sockets.adapter.rooms[electionRequested].sockets;
 	  	  	for(client in connectedClients) {
-	  	  		console.log("chega aqui com client:" + client);
+	  	  		nodesThatNeedToValidateVote.insert(client);
 	  	  		io.to(client).emit("isVoteValid", {voteToValidate: currentVoteToValidate});
 	  	  	}
 	  	  }
@@ -88,8 +91,14 @@ module.exports = function(io){
 
 		socket.on("voteValidationStatus", function(obj){
 			if(obj.isVoteValid === true) {
-				console.log("socket that confirmed vote has id :" + socket.id + "\n");
-				console.log("the list of peers that need to confirm vote is: " + peersThatNeedToValidateVote);
+				if(nodesThatNeedToValidateVote.search(obj.id)){
+					nodesThatNeedToValidateVote.remove(obj.id);
+					if(nodesThatNeedToValidateVote.getLength() === 0) {
+						/* sends signal to all voters to persist vote in the votechain */
+					}
+				} else {
+					socket.emit("Peer ID not found");
+				}
 			}
 		});
 
