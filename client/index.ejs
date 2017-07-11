@@ -64,12 +64,19 @@
   	  socket.emit("validateVote", { voteToValidate: voteToInsert, electionToRetrieveVotechain: mElection });
   }
   /* inserting a vote into the votechain */
-
   socket.on("isVoteValid", function(obj) {
   	console.log("chega aqui");
   	console.log(JSON.stringify(obj));
     if(obj !== null){
-      socket.emit("voteValidationStatus", {isVoteValid: true });
+      validVote = obj.voteToValidate;
+      socket.emit("voteValidationStatus", {isVoteValid: true, validVote : validVote });
     }
+  });
+  /* persisting a vote to the votechain */
+  socket.on("persistVote", function(obj) {
+    console.log("chega em persistVote");
+    let voteToPersistToVotechain = obj.voteToPersist;
+    this.votechain.push(voteToPersistToVotechain);
+    console.log(this.votechain);
   });
 </script>

@@ -1,3 +1,6 @@
+/*TODO
+  debug funcao de search da linked list, detalhes no console.log
+*/
 let Election = require('../controllers/electionController');
 let request  = require('request');
 let async	   = require('async');
@@ -68,6 +71,9 @@ module.exports = function(io){
 			});
 	  	  if(electionExists) {
 	  	  	var connectedClients = io.sockets.adapter.rooms[electionRequested].sockets;
+	  	  	console.log(typeof nodesThatNeedToValidateVote);
+	  	  	console.log(JSON.stringify(nodesThatNeedToValidateVote));
+	  	  	nodesThatNeedToValidateVote.setElection = electionRequested;
 	  	  	for(client in connectedClients) {
 	  	  		nodesThatNeedToValidateVote.insert(client);
 	  	  		io.to(client).emit("isVoteValid", {voteToValidate: currentVoteToValidate});
@@ -91,10 +97,17 @@ module.exports = function(io){
 
 		socket.on("voteValidationStatus", function(obj){
 			if(obj.isVoteValid === true) {
+				console.log("passa validacao de obj.isVoteValid");
+				console.log("nodesThatNeedToValidateVote.search(obj.id) : \n");
+				console.log(nodesThatNeedToValidateVote.search(obj.id));
 				if(nodesThatNeedToValidateVote.search(obj.id)){
 					nodesThatNeedToValidateVote.remove(obj.id);
 					if(nodesThatNeedToValidateVote.getLength() === 0) {
-						/* sends signal to all voters to persist vote in the votechain */
+						let electionSocketRoom = nodesThatNeedToValidateVote.getElection();
+						let connectedClients   = io.sockets.adapter.rooms[electionRequested].sockets;
+						for(client in connectedClients) {
+							io.to(client).emit("persistVote", {voteToPersist: obj.validVote });
+						}
 					}
 				} else {
 					socket.emit("Peer ID not found");

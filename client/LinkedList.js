@@ -3,6 +3,13 @@ exports.linkedList = class {
 		this.head = null;
 		this.tail = null;
 		this._length = 0;
+		this._election = "";
+	}
+	set setElection(election) {
+		this._election = election;
+	}
+	get getElection() {
+		return this._election;
 	}
 	get getLength() {
 		return this._length;
@@ -20,7 +27,7 @@ exports.linkedList = class {
 		this._length++;
 		return node.getData;
 	}
-	iterate(){
+	iterate() {
 		var currentNode = this.head;
 		while(currentNode !== null) {
 			console.log(currentNode.data);
@@ -29,10 +36,13 @@ exports.linkedList = class {
 	}
 	search(data) {
 		var currentNode = this.head;
+		console.log("data: " + data);
 		while(currentNode !== null) {
+			console.log(currentNode.data);
 			if(data === currentNode.data) {
 				return currentNode;
 			}
+			currentNode = currentNode.next;
 		}
 		return false;
 	}
@@ -63,7 +73,7 @@ exports.linkedList = class {
 		return true; 
 	}
 }
-class Node{
+class Node {
 	constructor(data){
 		this.prev = null;
 		this.next = null;
