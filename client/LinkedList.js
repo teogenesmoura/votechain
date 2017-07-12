@@ -30,15 +30,13 @@ exports.linkedList = class {
 	iterate() {
 		var currentNode = this.head;
 		while(currentNode !== null) {
-			console.log(currentNode.data);
+			console.log(currentNode.getData + '\n');
 			currentNode = currentNode.next;
 		}
 	}
 	search(data) {
 		var currentNode = this.head;
-		console.log("data: " + data);
 		while(currentNode !== null) {
-			console.log(currentNode.data);
 			if(data === currentNode.data) {
 				return currentNode;
 			}
@@ -48,28 +46,37 @@ exports.linkedList = class {
 	}
 	remove(data) {
 		let currentNode = this.search(data);
+		console.log("lista completa: ");
+		this.iterate();
+		console.log("entra em remove. currentNode: " + currentNode.getData);
+		console.log("this.head: " + this.head);
+		console.log("currentNode: " + currentNode);
+		console.log("this.head === currentNode : " +  (this.head === currentNode));
 		if(!currentNode) return false;
 		if(currentNode === this.head) {
-			this.head = currentNode.next;
-			if(this.head) {
-				this.head.previous = null;
-			} else {
-				this.tail = null;
+			/* there is no block after this.head, therefore this.head === this.tail */
+			if(this.head.next === null) {
+				this.head.setData = "";
+				this._length = 0;
+			} 
+			else if (this.head.next != null) {
+				this.head = currentNode.next;
+				currentNode.prev = null;
+				this._length--;
 			}
-		}
-		if(currentNode === this.tail) {
+		} else if(currentNode === this.tail && (this.tail !== this.head)) {
 			this.tail = this.tail.prev;
-			this.tail.prev = null;
+			this.tail.next = null;
+			this._length--;
 		} else {
-			let nodeBeforeTheOneToDelete = currentNode.prev;
-			let nodeAfterTheOneToDelete  = currentNode.next;
-			let nodeToDelete   			 = currentNode;
-
+			let nodeBeforeTheOneToDelete  = currentNode.prev;
+			let nodeAfterTheOneToDelete   = currentNode.next;
+			let nodeToDelete   			      = currentNode;
 			nodeBeforeTheOneToDelete.next = nodeAfterTheOneToDelete;
 			nodeAfterTheOneToDelete.prev  = nodeBeforeTheOneToDelete;
-			nodeToDelete 			      = null;
+			nodeToDelete 			            = null;
+			this._length--;
 		}
-		this._length--;
 		return true; 
 	}
 }
@@ -81,5 +88,8 @@ class Node {
 	}
 	get getData() {
 		return this.data;
+	}
+	set setData(data) {
+		this.data = data;
 	}
 }

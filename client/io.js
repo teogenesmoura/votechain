@@ -46,7 +46,6 @@ module.exports = function(io){
 								joinRoom: function(callback) {
 									socket.join(obj.electionRequested, () => {
 										let rooms = Object.keys(socket.rooms);
-										console.log(rooms);
 										callback(rooms);
 									});
 								}, function(e, r) {
@@ -71,8 +70,6 @@ module.exports = function(io){
 			});
 	  	  if(electionExists) {
 	  	  	var connectedClients = io.sockets.adapter.rooms[electionRequested].sockets;
-	  	  	console.log(typeof nodesThatNeedToValidateVote);
-	  	  	console.log(JSON.stringify(nodesThatNeedToValidateVote));
 	  	  	nodesThatNeedToValidateVote.setElection = electionRequested;
 	  	  	for(client in connectedClients) {
 	  	  		nodesThatNeedToValidateVote.insert(client);
@@ -83,7 +80,6 @@ module.exports = function(io){
 
 		socket.on("getCurrentVotechain", function(obj){
 			let votechainReceived = obj.clientCurrentVotechain;
-
 			if(votechainReceived === currentVotechain) {
 				socket.emit("VotechainUpToDate");
 			}
@@ -97,13 +93,10 @@ module.exports = function(io){
 
 		socket.on("voteValidationStatus", function(obj){
 			if(obj.isVoteValid === true) {
-				console.log("passa validacao de obj.isVoteValid");
-				console.log("nodesThatNeedToValidateVote.search(obj.id) : \n");
-				console.log(nodesThatNeedToValidateVote.search(obj.id));
-				if(nodesThatNeedToValidateVote.search(obj.id)){
-					nodesThatNeedToValidateVote.remove(obj.id);
-					if(nodesThatNeedToValidateVote.getLength() === 0) {
-						let electionSocketRoom = nodesThatNeedToValidateVote.getElection();
+				if(nodesThatNeedToValidateVote.search(socket.id)){
+					nodesThatNeedToValidateVote.remove(socket.id);
+					if(nodesThatNeedToValidateVote.getLength === 0) {
+						let electionRequested  = nodesThatNeedToValidateVote.getElection;
 						let connectedClients   = io.sockets.adapter.rooms[electionRequested].sockets;
 						for(client in connectedClients) {
 							io.to(client).emit("persistVote", {voteToPersist: obj.validVote });

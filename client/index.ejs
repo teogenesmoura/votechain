@@ -74,9 +74,7 @@
   });
   /* persisting a vote to the votechain */
   socket.on("persistVote", function(obj) {
-    console.log("chega em persistVote");
     let voteToPersistToVotechain = obj.voteToPersist;
-    this.votechain.push(voteToPersistToVotechain);
-    console.log(this.votechain);
+    votechain.push(voteToPersistToVotechain);
   });
 </script>
