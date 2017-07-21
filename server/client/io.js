@@ -1,5 +1,5 @@
-/*TODO
-  debug funcao de search da linked list, detalhes no console.log
+/* TODO
+ debug funcao de search da linked list, detalhes no console.log
 */
 let Election = require('../controllers/electionController');
 let request  = require('request');
@@ -20,13 +20,10 @@ var nodesThatNeedToValidateVote = new linkedList();
 *  @params: electionRequested
 *  @returns: connects socket to election room or sends error message
 *  socket.on('joinElection');
-*/
-
-/*
-* Current protocol:
-* Client connects -> Server emit 'connected'
-* Client on 'join election' -> Server emits 'connected to election'
-* Client on 'validateVote'  -> Server emits 'isVoteValid' OR 'Election does not exist'
+*  Current protocol:
+*  Client connects -> Server emit 'connected'
+*  Client on 'join election' -> Server emits 'connected to election'
+*  Client on 'validateVote'  -> Server emits 'isVoteValid' OR 'Election does not exist'
 */
 module.exports = function(io){
 	io.on('connection', function(socket){ 
@@ -67,7 +64,7 @@ module.exports = function(io){
   			if(electionRequested === key) {
   				electionExists = true;
   				}
-			});
+				});
 	  	  if(electionExists) {
 	  	  	var connectedClients = io.sockets.adapter.rooms[electionRequested].sockets;
 	  	  	nodesThatNeedToValidateVote.setElection = electionRequested;
@@ -119,35 +116,3 @@ module.exports = function(io){
 		});
 	});
 }
-
-
-
-
-
-
-// io.on('connection', function(socket){
-// 	socket.on('userAuth', function(obj) {
-// 		let getURI = ROOT_URL + 'voter/' + obj.voter;
-// 		request.get(getURI,	function(err, res, body) {
-// 			if(!err && res.statusCode == 200 && res.body !== '[]') {
-// 				socket.emit('authenticated', {message: 'user was authenticated'} );
-// 			} else {
-// 				socket.emit('unauthenticated', {message: 'user wasnt authenticated'} );
-// 				}
-// 			}
-// 		);
-// 	});
-// 	socket.on('castVote', function(obj,callbackFn){
-// 		console.log('chega aqui');
-// 		request.post(
-// 			ROOT_URL + 'election/castVote',
-// 			{ json: { election: obj.election, candidate: obj.candidate, voter: obj.voter } },
-// 			function(error, response, body) {
-// 				if(!error && response.statusCode == 200) {
-// 					let responseObj = JSON.stringify(response);
-// 					socket.emit('vote was cast', {responseObj});
-// 				}
-// 			}
-// 		);
-// 	});
-// });

@@ -16,5 +16,10 @@
     "mongoose": "^4.11.1",
     "request": "^2.81.0",
     "socket.io": "^2.0.3"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-import": "^2.7.0"
   }
 }

@@ -1,16 +1,17 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
-<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-<script src="https://cdn.jsdelivr.net/async/2.4.0/async.js"></script>
+var votechain = [{ "voterID" : 1, "candidateID" : 1}];
+let mElection = "BRGeneralElection";
+let socket = io.connect('http://localhost:3000');
+let voteToInsert = { "voterID": "595fe92cef29084d1cc8d6a2", "candidateID": "592fe72cef29084d1cc8d6a2" };
 
-<script>
-  let votechain = [{ "voterID" : 1, "candidateID" : 1}];
-  let mElection = "BRGeneralElection";
-  let socket = io.connect('http://localhost:3000');
-  let voteToInsert = {"voterID": "595fe92cef29084d1cc8d6a2", "candidateID": 1};
+$(document).ready(function() { 
+  /* functions available */
+  //validateVote();
+  //joinElection(mElection);
+
   /* connection establishment and votechain sync */
   socket.on("connected", function(response) {
     console.log(response.message);
-    socket.emit('joinElection', { electionRequested: mElection});
+    joinElection(mElection);
   });
 
   socket.on("connected to election", function(response) {
@@ -27,6 +28,7 @@
     if(obj.currentVotechain !== null) {
       votechain = obj.currentVotechain;
       console.log("updated votechain is: " + JSON.stringify(votechain));
+      validateVote();
     } else {
       console.log('currentVotechain object was null');
     }
@@ -43,9 +45,7 @@
       votechain = obj.currentVotechain;
     }
   });
-
   /*ERROR MESSAGES*/
-
   socket.on("disconnect", function() {
     console.log("disconnect");
   });
@@ -56,5 +56,29 @@
 
   socket.on("election was not found", function(obj) {
     console.log('election was not found');
+
+  /* inserting a vote into the votechain */
+  socket.on("isVoteValid", function(obj) {
+    if(obj !== null){
+      validVote = obj.voteToValidate;
+      socket.emit("voteValidationStatus", {isVoteValid: true, validVote : validVote });
+    }
+  });
+  /* persisting a vote to the votechain */
+  socket.on("persistVote", function(obj) {
+    let voteToPersistToVotechain = obj.voteToPersist;
+    votechain.push(voteToPersistToVotechain);
+  });
+
   });   
-</script>
+  let validateVote = function validateVote(){ 
+      socket.emit("validateVote", { voteToValidate: voteToInsert, electionToRetrieveVotechain: mElection });
+  }
+  let joinElection = function joinElection(mElection){
+      socket.emit('joinElection', { electionRequested: mElection});
+  }
+});
+
+function getVotechain(){
+    return JSON.stringify(votechain);
+}
