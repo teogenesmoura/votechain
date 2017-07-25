@@ -6,12 +6,14 @@ let request  = require('request');
 let async	   = require('async');
 let port 		 =  3000 || process.env.PORT;
 let ROOT_URL = 'http://localhost:' + port; 
-let currentVotechain = [{"voterID": "595fe92cef29084d1cc8d6a2", "candidateID": 1}, {"voterID": "5955c91b8d8840b9049ab14d", "candidateID": 2}, {"voterID": "595a94e2dbd111fe1e8b4ac9", "candidateID":1}];
-let currentVoteToValidate = { "voterID": "595fe92cef29084d1cc8d6a2", "candidateID": 1 };
+const TreeMap = require('treemap-js');
+let electionVotechainMap = new TreeMap();
 let currentNumberOfConnectedClients = 0;
 let currentNumberOfValidatedVotes = 0;
-var { linkedList } = require('./LinkedList');
-var nodesThatNeedToValidateVote = new linkedList();
+let HashTable = require('hashtable');
+let voteCountElectionMap = new HashTable();
+// var { linkedList } = require('./LinkedList');
+// var nodesThatNeedToValidateVote = new linkedList();
 
 /**
 * Initiates a connection between the socket and the server.
@@ -36,6 +38,12 @@ module.exports = function(io){
 			if(obj === null) { socket.emit('obj was null'); } 
 			else {
 				let requestURL = ROOT_URL + '/election/' + obj.electionRequested;
+
+				/* checks if the election requested is already indexed by the application */
+				if(!electionVotechainMap.get(obj.electionRequested)) {
+					electionVotechainMap.set(obj.electionRequested, []);
+				}
+
 				request.get(requestURL, function(err, res, body) {
 					if(!err && res.statusCode == 200 && res.body !== '[]'){
 						async.parallel(
@@ -53,6 +61,21 @@ module.exports = function(io){
 				});
 			}
 		});
+
+		socket.on("getCurrentVotechain", function(obj){
+			let electionRequested = obj.clientElectionRequested;
+			let votechainReceived = obj.clientCurrentVotechain;
+			let currentVotechainForGivenElection = getVotesForGivenElection(electionRequested);
+
+			if(votechainReceived === currentVotechainForGivenElection) {
+				socket.emit("VotechainUpToDate");
+			}
+			else {
+				socket.emit("ServerSendsVotechainToClient", { currentVotechain: currentVotechainForGivenElection });
+			}
+		});
+
+
 	  /**
 	  * returns a candidate vote and queries all clients connected to an election to validate that vote
 	  **/
@@ -66,43 +89,20 @@ module.exports = function(io){
   				}
 				});
 	  	  if(electionExists) {
-	  	  	var connectedClients = io.sockets.adapter.rooms[electionRequested].sockets;
-	  	  	nodesThatNeedToValidateVote.setElection = electionRequested;
-	  	  	for(client in connectedClients) {
-	  	  		nodesThatNeedToValidateVote.insert(client);
-	  	  		io.to(client).emit("isVoteValid", {voteToValidate: currentVoteToValidate});
-	  	  	}
-	  	  }
-		});
+      		io.sockets.emit("isVoteValid", {voteToValidate: voteToValidate});
+      		console.log(io.sockets.clients().length + "sockets connected");
+      	}
+			});
 
-		socket.on("getCurrentVotechain", function(obj){
-			let votechainReceived = obj.clientCurrentVotechain;
-			if(votechainReceived === currentVotechain) {
-				socket.emit("VotechainUpToDate");
-			}
-			if(votechainReceived.length < currentVotechain.length) {	
-				socket.emit("ServerSendsVotechainToClient", { currentVotechain: currentVotechain });
-			}
-			if(votechainReceived.length > currentVotechain.length) {
-				socket.emit("VotechainReceivedLongerThanCurrentVotechain");
-			}
-		});
-
+			//nodesThatNeedToValidateVote.setElection = electionRequested;
+	  	// nodesThatNeedToValidateVote.insert(client);
 		socket.on("voteValidationStatus", function(obj){
 			if(obj.isVoteValid === true) {
-				if(nodesThatNeedToValidateVote.search(socket.id)){
-					nodesThatNeedToValidateVote.remove(socket.id);
-					if(nodesThatNeedToValidateVote.getLength === 0) {
-						let electionRequested  = nodesThatNeedToValidateVote.getElection;
-						let connectedClients   = io.sockets.adapter.rooms[electionRequested].sockets;
-						for(client in connectedClients) {
-							io.to(client).emit("persistVote", {voteToPersist: obj.validVote });
-						}
-					}
+				  console.log("entra aqui");
+					io.sockets.emit("persistVote", {voteToPersist: obj.validVote });
 				} else {
 					socket.emit("Peer ID not found");
 				}
-			}
 		});
 
 		socket.on("forceGetCurrentVotechain", function(obj){
@@ -115,4 +115,41 @@ module.exports = function(io){
 			console.log("number of connected clients: " + currentNumberOfConnectedClients);
 		});
 	});
+
+	function getVotesForGivenElection(electionRequested) {
+		return electionVotechainMap.get(electionRequested);
+	}
+
+	/**
+	* updates the index of Election -> List of votes with the new vote
+	* @params: electionRequested, voteToInsert
+	*/
+
+	function updateElectionVotechainMapNewVote(electionRequested, voteToInsert) {
+		let currentVotesForElectionRequested = electionVotechainMap.get(electionRequested);
+		let updatedVotes = currentVotesForElectionRequested.push(voteToInsert);
+		electionVotechainMap.remove(electionRequested);
+		electionVotechainMap.set(electionRequested, updatedVotes);
+	}
+
 }
+
+		// socket.on("voteValidationStatus", function(obj){
+		// 	if(obj.isVoteValid === true) {
+		// 		if(nodesThatNeedToValidateVote.search(socket.id)){
+		// 			nodesThatNeedToValidateVote.remove(socket.id);
+		// 			if(nodesThatNeedToValidateVote.getLength === 0) {
+		// 				let electionRequested  = nodesThatNeedToValidateVote.getElection;
+		// 				let connectedClients   = io.sockets.adapter.rooms[electionRequested].sockets;
+		// 				for(client in connectedClients) {
+		// 					updateElectionVotechainMapNewVote(electionRequested, obj.validVote);
+		// 					console.log("Votes on the server side:" + getVotesForGivenElection(electionRequested));
+		// 					io.to(client).emit("persistVote", {voteToPersist: obj.validVote });
+		// 				}
+		// 			}
+		// 		} else {
+		// 			socket.emit("Peer ID not found");
+		// 		}
+		// 	}
+		// });
+

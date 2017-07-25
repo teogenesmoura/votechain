@@ -34,21 +34,63 @@ const elections = [
     }
 ];
 
+function isSearched(searchTerm) {
+  return function(item) {
+    return !searchTerm || item.title.toLowerCase().includes(searchTerm.toLowerCase());
+  }
+}
+
 class App extends Component {
+  constructor(props) {
+    super(props);
+    
+    this.state = {
+      elections,
+      searchTerm: '',
+      socketsList: [],
+    };
+    this.onSearchChange = this.onSearchChange.bind(this);
+    this.onDismiss = this.onDismiss.bind(this);
+  }
+  onSearchChange(event) {
+    this.setState({ searchTerm: event.target.value });
+  }
+  onDismiss(_id) {
+    function isNotId(item) {
+      return item._id !== _id;
+    }
+    const updatedElections = this.state.elections.filter(isNotId);
+    this.setState({ elections: updatedElections });
+  }
+
   render() {
     return (
       <div className="App">
-        {elections.map(election =>  {
-          return (
-            <div key={election.objectID}>
+      <form>
+        <input type="text" onChange={this.onSearchChange}/>
+      </form>
+       {this.state.elections.filter(isSearched(this.searchTerm)).map(item => 
+            <div>
             <span>{election.name}</span>
             <span>{election.voters}</span>
+            </div>
+        )}
+        {this.state.elections.map(election =>
+            <div key={election._id}>
+            <span>{election.name}</span>
+            <span>{election.voters}</span>
+            <span>
+              <button onClick={() => this.onDismiss(election._id)} type="button">
+              Dismiss
+              </button>
+            </span>
             <span> <br/></span>
             </div>
-            );
-        })} 
-      </div>
-    );
+        )} 
+        {this.state.socketsList.map(socket => 
+          <div key={socket.objectID}></div>
+        )}
+    )
   }
 }
 

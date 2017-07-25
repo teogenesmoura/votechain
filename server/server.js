@@ -8,7 +8,6 @@ const mongoose = require('mongoose');
 const path = require('path');
 const port = process.env.PORT || 3000;
 const ROOT_URL = process.env.ROOT_URL || 'http://localhost:3000/';
-
 /* 
  * Mongoose by default sets the auto_reconnect option to true.
  * We recommend setting socket options at both the server and replica set level.

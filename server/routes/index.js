@@ -41,4 +41,7 @@ router.route('/client')
 	  		res.render('client', {ROOT_URL: process.env.ROOT_URL });
 		});
 
+router.route('/listElections')
+	  .get(election.listElections);
+
 module.exports = router;

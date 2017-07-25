@@ -43,7 +43,7 @@ function getElectionByName(req, res) {
 			if(r.election == null) {
 				res.send('election not found');
 			} else { 
-				res.json(r.election);
+				res.render('electionRoom');
 			}
 		});
 }
@@ -57,6 +57,29 @@ function getElection(req, res) {
 		if(err) res.send(err);
 		res.json(elections);
 	}); 
+}
+
+function listElections(req, res) {
+	var result;
+	async.parallel(
+	{
+		elections: function(callback) {
+			Election.find({}, function(err,elections) {
+				callback(err, elections);
+			});
+		}
+	},
+	function(e, r) {
+		if(r.elections === null){ 
+			console.log('no elections to display');
+			res.render('listElections', { 'elections': 'No elections to display' });
+		} else {
+			result = r.elections;
+			res.render('listElections', {'elections': result });
+			}
+		}
+	);
+	
 }
 /**
 * Adds a voter to an Election
@@ -147,4 +170,4 @@ function getVotechainFromElection(req, res) {
 }
 module.exports = { initializeElection, getElection,
 				   addVoterToElection, castVoteToCandidateInElection,
-				   getElectionByName };
+				   getElectionByName, listElections };
