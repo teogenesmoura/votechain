@@ -1,8 +1,12 @@
 var votechain = [];
 let socket = io.connect('http://localhost:3000');
-let voteToInsert = { "candidate": "595fe92cef29084d1cc8d6a2", "voter": "592fe72cef29084d1cc8d6a2" };
 
 $(document).ready(function() { 
+
+  $('#voting-btn').click(function() {
+      console.log($('#candidateToVoteFor').val());
+      castVote(($('#candidateToVoteFor').val()));
+    });
   /* functions available */
   //validateVote();
   //joinElection(mElection);
@@ -11,8 +15,7 @@ $(document).ready(function() {
   socket.on("connected", function(response) {
     console.log(response.message);
     console.log("currentVotechain: " + votechain);
-    $('.connected').text(response.message);
-    $('.electionName').text(mElection);
+    $('.navbar-brand').text(mElection);
     joinElection(mElection);
   });
 
@@ -24,15 +27,11 @@ $(document).ready(function() {
 
   socket.on("VotechainUpToDate", function(obj) {
     console.log("VotechainUpToDate");
-    $('.votechainUpToDate').text("local votechain is up to date");
-    validateVote();
   });
 
   socket.on("ServerSendsVotechainToClient", function(obj) {
     if(obj.currentVotechain !== null) {
         votechain = obj.currentVotechain;
-          $('.votechainReceived').text(JSON.stringify(votechain));
-          validateVote();
     } else {
       console.log('currentVotechain object was null');
     }
@@ -43,8 +42,11 @@ $(document).ready(function() {
       socket.emit("forceGetCurrentVotechain");
     } else {
       votechain = obj.currentVotechain;
-      $('.currentVotechain').text(JSON.stringify(votechain));
-    }
+      for(vote in votechain) {
+        $('.votechainLog').append("<tr><td>" + JSON.stringify(vote.candidate) + "</td><td>"
+                              + JSON.stringify(vote.voter) + "</td></tr>");    
+        }
+      }
   });
 
     /* inserting a vote into the votechain */
@@ -61,6 +63,8 @@ $(document).ready(function() {
   socket.on("persistVote", function(obj) {
     console.log("persistVote" + obj.voteToPersist);
     let voteToPersistToVotechain = obj.voteToPersist;
+    $('.votechainLog').append("<tr><td>" + JSON.stringify(obj.voteToPersist.candidate) + "</td><td>"
+                              + JSON.stringify(obj.voteToPersist.voter) + "</td></tr>");
     votechain.push(voteToPersistToVotechain);
     printVotechain();
   });
@@ -77,21 +81,27 @@ $(document).ready(function() {
   socket.on("election was not found", function(obj) {
     console.log('election was not found');
 
-  socket.on("teste", function(obj) {
-    console.log("teste");
-  });
-
   });   
-  let validateVote = function validateVote(){ 
-    socket.emit("validateVote", { voteToValidate: voteToInsert, electionToRetrieveVotechain: mElection });
-  }
+  // let castVote = function castVote(vote){ 
+  //   socket.emit("validateVote", { voteToValidate: voteToInsert, electionToRetrieveVotechain: mElection });
+  // }
   let joinElection = function joinElection(mElection){
       socket.emit('joinElection', { electionRequested: mElection});
   }
 });
+function castVote(candidate) {
+  let voteToInsert = { "candidate": candidate, "voter": socket.id };
+  socket.emit("validateVote", { voteToValidate: voteToInsert, electionToRetrieveVotechain: mElection });
+  console.log(voteToInsert);
+}
 function printVotechain() {
   console.log("Votechain on clientside: " + getVotechain());
 }
 function getVotechain(){
     return JSON.stringify(votechain);
+}
+function exportJSON(el) {
+    var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(votechain));
+    el.setAttribute("href", "data:"+data);
+    el.setAttribute("download", "data.json");
 }

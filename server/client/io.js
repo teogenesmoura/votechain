@@ -91,15 +91,14 @@ module.exports = function(io){
 	  	  if(electionExists) {
       		io.sockets.emit("isVoteValid", {voteToValidate: voteToValidate});
       		console.log(io.sockets.clients().length + "sockets connected");
-      	}
+      			}
 			});
 
 			//nodesThatNeedToValidateVote.setElection = electionRequested;
 	  	// nodesThatNeedToValidateVote.insert(client);
 		socket.on("voteValidationStatus", function(obj){
 			if(obj.isVoteValid === true) {
-				  console.log("entra aqui");
-					io.sockets.emit("persistVote", {voteToPersist: obj.validVote });
+					socket.emit("persistVote", {voteToPersist: obj.validVote });
 				} else {
 					socket.emit("Peer ID not found");
 				}

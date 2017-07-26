@@ -44,7 +44,7 @@ function getElectionByName(req, res) {
 				res.send('election not found');
 			} else { 
 				res.render('electionRoom');
-			}
+							}
 		});
 }
 /**
