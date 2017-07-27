@@ -13,8 +13,7 @@ $(document).ready(function() {
 
   /* connection establishment and votechain sync */
   socket.on("connected", function(response) {
-    console.log(response.message);
-    console.log("currentVotechain: " + votechain);
+    console.log(response.message); //should print 'you're connected'
     $('.navbar-brand').text(mElection);
     joinElection(mElection);
   });
@@ -23,10 +22,6 @@ $(document).ready(function() {
     console.log(response.message);
     $('.connected').text(response.message);
     socket.emit("getCurrentVotechain", { clientCurrentVotechain: votechain, clientElectionRequested: mElection });
-  });
-
-  socket.on("VotechainUpToDate", function(obj) {
-    console.log("VotechainUpToDate");
   });
 
   socket.on("ServerSendsVotechainToClient", function(obj) {

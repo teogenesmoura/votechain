@@ -22,7 +22,7 @@ clone this repo
 git clone https://github.com/teogenesmoura/votechain.git
 ``` 
 Install dependencies
-```
+
 npm install 
 ``` 
 run :)

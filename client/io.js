@@ -35,29 +35,33 @@ module.exports = function(io){
 		socket.emit('connected', { message: "you're connected" });
 
 		socket.on('joinElection', function(obj) {
-			if(obj === null) { socket.emit('obj was null'); } 
-			else {
+			let electionExists = false;
+			if(obj === null) { 
+				socket.emit('obj was null');
+		  }	else {
 				let requestURL = ROOT_URL + '/election/' + obj.electionRequested;
 
 				/* checks if the election requested is already indexed by the application */
 				if(!electionVotechainMap.get(obj.electionRequested)) {
 					electionVotechainMap.set(obj.electionRequested, []);
 				}
-
+				/* checks whether the election was created with the API */
 				request.get(requestURL, function(err, res, body) {
 					if(!err && res.statusCode == 200 && res.body !== '[]'){
-						async.parallel(
-							{
-								joinRoom: function(callback) {
-									socket.join(obj.electionRequested, () => {
-										let rooms = Object.keys(socket.rooms);
-										callback(rooms);
-									});
-								}, function(e, r) {
-									socket.emit("connected to election", { message: 'socket ' + socket.id + ' joined election ' + obj.electionRequested });
+						electionExists = !electionExists;
 							}
 						});						
-					}
+				/* joins election's socket.io room  */
+				async.parallel({
+					joinRoom: function(callback) {
+						socket.join(obj.electionRequested, () => {
+							let rooms = Object.keys(socket.rooms);
+							console.log(rooms);
+							callback(rooms);
+							});
+					}, function(e, r) {
+							socket.emit("connected to election", { message: 'socket ' + socket.id + ' joined election ' + obj.electionRequested });
+						}
 				});
 			}
 		});
@@ -66,13 +70,7 @@ module.exports = function(io){
 			let electionRequested = obj.clientElectionRequested;
 			let votechainReceived = obj.clientCurrentVotechain;
 			let currentVotechainForGivenElection = getVotesForGivenElection(electionRequested);
-
-			if(votechainReceived === currentVotechainForGivenElection) {
-				socket.emit("VotechainUpToDate");
-			}
-			else {
-				socket.emit("ServerSendsVotechainToClient", { currentVotechain: currentVotechainForGivenElection });
-			}
+			socket.emit("ServerSendsVotechainToClient", { currentVotechain: currentVotechainForGivenElection });
 		});
 
 
@@ -89,9 +87,9 @@ module.exports = function(io){
   				}
 				});
 	  	  if(electionExists) {
-      		io.sockets.emit("isVoteValid", {voteToValidate: voteToValidate});
+      		io.sockets.in(electionRequested).emit("isVoteValid", {voteToValidate: voteToValidate});
       		console.log(io.sockets.clients().length + "sockets connected");
-      			}
+      	}
 			});
 
 			//nodesThatNeedToValidateVote.setElection = electionRequested;
