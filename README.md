@@ -25,21 +25,12 @@ Install dependencies
 
 npm install 
 ``` 
-run :)
-```
 Change the MongoDB connection URL to your URL
-``
-```
-4 - 
-```
 
-## Deployment
-
-soon.
-<!-- 1 - Create a new account on Heroku
-2 - git push the code to your repo
-3 - link your git link into Heroku
-4 - Deploy! -->
+run :)
+``` 
+sudo nodemon server.js
+```
 
 ## Tech Stack
 Node JS/Express JS
