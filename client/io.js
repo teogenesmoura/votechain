@@ -80,16 +80,12 @@ module.exports = function(io){
 	  socket.on("validateVote", function(obj){
 	  	  let electionRequested = obj.electionToRetrieveVotechain;
 	  	  let voteToValidate = obj.voteToValidate;
-	  	  let electionExists = false;
 	  	  Object.keys(socket.rooms).forEach(function(key) {
-  			if(electionRequested === key) {
-  				electionExists = true;
-  				}
+		 			if(electionRequested === key) {
+	  				io.sockets.in(electionRequested).emit("isVoteValid", {voteToValidate: voteToValidate});
+	  				return;
+	  				}
 				});
-	  	  if(electionExists) {
-      		io.sockets.in(electionRequested).emit("isVoteValid", {voteToValidate: voteToValidate});
-      		console.log(io.sockets.clients().length + "sockets connected");
-      	}
 			});
 
 			//nodesThatNeedToValidateVote.setElection = electionRequested;

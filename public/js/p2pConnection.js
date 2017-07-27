@@ -33,15 +33,11 @@ $(document).ready(function() {
   });
 
   socket.on("currentStateOfVotechainOnServer", function(obj) {
-    if(obj === null){
-      socket.emit("forceGetCurrentVotechain");
-    } else {
       votechain = obj.currentVotechain;
       for(vote in votechain) {
         $('.votechainLog').append("<tr><td>" + JSON.stringify(vote.candidate) + "</td><td>"
                               + JSON.stringify(vote.voter) + "</td></tr>");    
         }
-      }
   });
 
     /* inserting a vote into the votechain */
