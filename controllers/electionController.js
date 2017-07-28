@@ -75,6 +75,7 @@ function listElections(req, res) {
 			res.render('listElections', { 'elections': 'No elections to display' });
 		} else {
 			result = r.elections;
+			console.log("result: " + r.elections);
 			res.render('listElections', {'elections': result });
 			}
 		}

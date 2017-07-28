@@ -12,6 +12,7 @@
     "async": "^2.5.0",
     "body-parser": "^1.17.2",
     "bootstrap-material-design": "^0.5.10",
+    "browser-request": "^0.3.3",
     "ejs": "^2.5.6",
     "express": "^4.15.3",
     "hashtable": "^2.0.2",

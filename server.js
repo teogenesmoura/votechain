@@ -39,4 +39,3 @@ conn.once('open', function() {
 	initHttpServer();
 });
 module.exports = initHttpServer;
-// initP2PServer();

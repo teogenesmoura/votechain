@@ -64,18 +64,13 @@ $(document).ready(function() {
   socket.on("disconnect", function() {
     console.log("disconnect");
   });
-
   socket.on("connect_failed", function() {
     console.log("connection failed");
   });
-
   socket.on("election was not found", function(obj) {
     console.log('election was not found');
 
   });   
-  // let castVote = function castVote(vote){ 
-  //   socket.emit("validateVote", { voteToValidate: voteToInsert, electionToRetrieveVotechain: mElection });
-  // }
   let joinElection = function joinElection(mElection){
       socket.emit('joinElection', { electionRequested: mElection});
   }
