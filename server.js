@@ -5,9 +5,11 @@ const io = require('socket.io')(server);
 const modularIo = require('./client/io.js')(io);
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const expressValidator = require('express-validator');
 const path = require('path');
 const port = process.env.PORT || 3000;
 const ROOT_URL = process.env.ROOT_URL || 'http://localhost:3000/';
+
 /* 
  * Mongoose by default sets the auto_reconnect option to true.
  * We recommend setting socket options at both the server and replica set level.
@@ -26,6 +28,7 @@ let initHttpServer = () => {
 	app.use(bodyParser.urlencoded({ extended: true }));
 	app.use(bodyParser.json());
 	app.use(express.static('public'));
+	app.use(expressValidator());
 	app.use(require('./routes'));
 	app.set('views', path.join(__dirname, './client'));
 	app.set('view engine', 'ejs');

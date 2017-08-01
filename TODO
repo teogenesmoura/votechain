@@ -1,0 +1,9 @@
+0 - create page to create voter
+	 -> sign up voter
+1 - create page to create election
+	-> posts 'election' endpoint with name of election, number and name of candidates
+2 - backend should:	
+	-> validate candidates, check for duplicates and send appropriate response
+	-> generate an encrypted value for each candidate and keep a map between real name and encrypted value
+3 - frontend should:
+	-> display result of the query, lead to election page

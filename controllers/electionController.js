@@ -11,7 +11,7 @@ let async = require('async');
 /** initializes an election
 * @returns JSON document with the election created or error
 */
-function initializeElection(req, res) {
+function createElection(req, res) {
 	let election = new Election();
 	let votechain = new Votechain();
 	votechain.election = election;
@@ -169,6 +169,6 @@ function castVoteToCandidateInElection(req, res) {
 function getVotechainFromElection(req, res) {
 	let electionID = req.body.electionID;
 }
-module.exports = { initializeElection, getElection,
+module.exports = { createElection, getElection,
 				   addVoterToElection, castVoteToCandidateInElection,
 				   getElectionByName, listElections };

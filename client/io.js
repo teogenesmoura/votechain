@@ -2,16 +2,17 @@
  debug funcao de search da linked list, detalhes no console.log
 */
 let Election = require('../controllers/electionController');
-let request  = require('request');
-let async	   = require('async');
-let port 		 =  3000 || process.env.PORT;
+let request = require('request');
+let async = require('async');
+let shortid = require('shortid');
+let port =  3000 || process.env.PORT;
 let ROOT_URL = 'http://localhost:' + port; 
 const TreeMap = require('treemap-js');
 let electionVotechainMap = new TreeMap();
 let currentNumberOfConnectedClients = 0;
 let currentNumberOfValidatedVotes = 0;
 let HashTable = require('hashtable');
-let voteCountElectionMap = new HashTable();
+let lastVoteInElectionMap = new HashTable();
 // var { linkedList } = require('./LinkedList');
 // var nodesThatNeedToValidateVote = new linkedList();
 
@@ -73,13 +74,13 @@ module.exports = function(io){
 			socket.emit("ServerSendsVotechainToClient", { currentVotechain: currentVotechainForGivenElection });
 		});
 
-
 	  /**
 	  * returns a candidate vote and queries all clients connected to an election to validate that vote
 	  **/
 	  socket.on("validateVote", function(obj){
 	  	  let electionRequested = obj.electionToRetrieveVotechain;
 	  	  let voteToValidate = obj.voteToValidate;
+	  	  voteToValidate.election = electionRequested;
 	  	  Object.keys(socket.rooms).forEach(function(key) {
 		 			if(electionRequested === key) {
 	  				io.sockets.in(electionRequested).emit("isVoteValid", {voteToValidate: voteToValidate});
@@ -88,20 +89,22 @@ module.exports = function(io){
 				});
 			});
 
-			//nodesThatNeedToValidateVote.setElection = electionRequested;
-	  	// nodesThatNeedToValidateVote.insert(client);
 		socket.on("voteValidationStatus", function(obj){
-			if(obj.isVoteValid === true) {
+			obj.validVote.id = shortid.generate();
+   		if(obj.isVoteValid === true) {
+   			if(lastVoteInElectionMap.has(obj.validVote.election)) {
+					obj.validVote.previousVote = lastVoteInElectionMap.get(obj.validVote.election)
+				} else {
+					lastVoteInElectionMap.put(obj.validVote.election, obj.validVote);
+					obj.validVote.previousVote = "GenesisVote";
+				}	 
 					socket.emit("persistVote", {voteToPersist: obj.validVote });
 				} else {
 					socket.emit("Peer ID not found");
 				}
 		});
 
-		socket.on("forceGetCurrentVotechain", function(obj){
-			socket.emit("currentStateOfVotechainOnServer", {currentVotechain: currentVotechain });
-		});	
-	
+
 		socket.on('disconnect', function(socket){
 			console.log("socket " + socket.id + "disconnected\n");
 			currentNumberOfConnectedClients--;

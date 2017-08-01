@@ -1,12 +1,23 @@
 let Voter = require('../models/voter');
+const expressValidator = require('express-validator');
 
 function postVoter(req, res) {
 	let voter = new Voter();
+	req.assert('email', 'Email is not valid').isEmail();
+	req.assert('password', 'password must be at least 4 characters long').len(4);
+	req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
+	req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
 	voter.name = req.body.name;
+	voter.password = req.body.password;
 	voter.isCandidate = false;
-	voter.save(function(err) {
+
+	Voter.findOne({ email: req.body.email }, (err, existingUser) => {
 		if(err) res.send(err);
-		res.send(voter);
+		if(existingUser) res.send('voter already exists');
+		voter.save(function(err) {
+			if(err) res.send(err);
+			res.send(voter);
+		});
 	});
 }
 function turnVoterIntoCandidate(req, res) {
@@ -39,7 +50,9 @@ function getVoterByName(req, res) {
 		});
 	}
 }
-
+function inputForm(req, res) {
+	res.render('voterSignUp');
+}
 function localGetVoterByName(name){
 	let q = Voter.findOne({ 'name' : req.body.name });
 	let voter = q.exec((err, voter) => {
@@ -47,4 +60,4 @@ function localGetVoterByName(name){
 		return (voter);
 	});
 }
-module.exports = { postVoter, getVoters, getVoterByName, localGetVoterByName, turnVoterIntoCandidate }
+module.exports = { postVoter, getVoters, getVoterByName, localGetVoterByName, turnVoterIntoCandidate, inputForm }

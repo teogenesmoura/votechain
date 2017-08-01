@@ -13,7 +13,7 @@ router.route('/vote/:electionID')
 	  .get(vote.getVotesByElectionID);
 
 router.route('/election')
-	  .post(election.initializeElection)
+	  //.post(election.createElection)
 	  .get(election.getElection);
 
 router.route('/election/:electionName')
@@ -29,6 +29,9 @@ router.route('/voter')
 	  .post(voter.postVoter)
 	  .put(voter.turnVoterIntoCandidate)
 	  .get(voter.getVoters);
+
+router.route('/voterSignUp')
+	  .get(voter.inputForm);
 
 router.route('/voter/:name')
 	  .get(voter.getVoterByName);
