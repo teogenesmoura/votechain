@@ -12,7 +12,7 @@ let electionVotechainMap = new TreeMap();
 let currentNumberOfConnectedClients = 0;
 let currentNumberOfValidatedVotes = 0;
 let HashTable = require('hashtable');
-let lastVoteInElectionMap = new HashTable();
+let previousVoteToElectionMap = new HashTable();
 // var { linkedList } = require('./LinkedList');
 // var nodesThatNeedToValidateVote = new linkedList();
 
@@ -31,7 +31,7 @@ let lastVoteInElectionMap = new HashTable();
 module.exports = function(io){
 	io.on('connection', function(socket){ 
 		currentNumberOfConnectedClients++;
-		console.log("number of connected clients " + currentNumberOfConnectedClients);
+		//console.log("number of connected clients " + currentNumberOfConnectedClients);
 
 		socket.emit('connected', { message: "you're connected" });
 
@@ -90,15 +90,9 @@ module.exports = function(io){
 			});
 
 		socket.on("voteValidationStatus", function(obj){
-			obj.validVote.id = shortid.generate();
-   		if(obj.isVoteValid === true) {
-   			if(lastVoteInElectionMap.has(obj.validVote.election)) {
-					obj.validVote.previousVote = lastVoteInElectionMap.get(obj.validVote.election)
-				} else {
-					lastVoteInElectionMap.put(obj.validVote.election, obj.validVote);
-					obj.validVote.previousVote = "GenesisVote";
-				}	 
-					socket.emit("persistVote", {voteToPersist: obj.validVote });
+   		if(obj.isVoteValid) {
+   				let vote = prepareVoteToBePersisted(obj.validVote);
+					socket.emit("persistVote", {voteToPersist: vote });
 				} else {
 					socket.emit("Peer ID not found");
 				}
@@ -106,11 +100,30 @@ module.exports = function(io){
 
 
 		socket.on('disconnect', function(socket){
-			console.log("socket " + socket.id + "disconnected\n");
 			currentNumberOfConnectedClients--;
-			console.log("number of connected clients: " + currentNumberOfConnectedClients);
 		});
 	});
+
+	function prepareVoteToBePersisted(vote) {
+		vote.id = shortid.generate();
+		vote.previousVote = updatePreviousVoteReference(vote);
+		return vote;
+	}
+	function updatePreviousVoteReference(vote) {
+		let previousVote;
+		if(!previousVoteToElectionMap.has(vote.election)) {
+			console.log("entra em !previous...");
+			previousVoteToElectionMap.put(vote.election, vote.id);
+			previousVote = "Genesis Vote";
+		} else {
+			previousVote = previousVoteToElectionMap.get(vote.election);
+			console.log("entra aqui");
+			console.log("previousVote" + previousVote);
+			previousVoteToElectionMap.remove(vote.election);
+			previousVoteToElectionMap.put(vote.election, vote.id);
+		}
+		return previousVote;
+	}
 
 	function getVotesForGivenElection(electionRequested) {
 		return electionVotechainMap.get(electionRequested);
@@ -121,12 +134,6 @@ module.exports = function(io){
 	* @params: electionRequested, voteToInsert
 	*/
 
-	function updateElectionVotechainMapNewVote(electionRequested, voteToInsert) {
-		let currentVotesForElectionRequested = electionVotechainMap.get(electionRequested);
-		let updatedVotes = currentVotesForElectionRequested.push(voteToInsert);
-		electionVotechainMap.remove(electionRequested);
-		electionVotechainMap.set(electionRequested, updatedVotes);
-	}
 
 }
 

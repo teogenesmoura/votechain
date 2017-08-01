@@ -46,13 +46,13 @@ $(document).ready(function() {
     if(obj !== null){
       validVote = obj.voteToValidate;
       socket.emit("voteValidationStatus", {isVoteValid: true, validVote : validVote });
-      console.log("sent vote for validation");
+      //console.log("sent vote for validation");
     }
   });
 
   /* persisting a vote to the votechain */
   socket.on("persistVote", function(obj) {
-    console.log("persistVote" + obj.voteToPersist);
+    //console.log("persistVote" + obj.voteToPersist);
     let voteToPersistToVotechain = obj.voteToPersist;
     $('.votechainLog').append("<tr><td>" + JSON.stringify(obj.voteToPersist.candidate) + "</td><td>"
                               + JSON.stringify(obj.voteToPersist.voter) + "</td></tr>");
@@ -78,7 +78,7 @@ $(document).ready(function() {
 function castVote(candidate) {
   let voteToInsert = { "candidate": candidate, "voter": socket.id };
   socket.emit("validateVote", { voteToValidate: voteToInsert, electionToRetrieveVotechain: mElection });
-  console.log(voteToInsert);
+  //console.log(voteToInsert);
 }
 function printVotechain() {
   console.log("Votechain on clientside: " + getVotechain());
