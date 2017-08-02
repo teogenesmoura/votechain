@@ -1,3 +1,6 @@
 node_modules/
 naivechain/
 .DS_Store
+csr.pem
+file.crt
+file.pem

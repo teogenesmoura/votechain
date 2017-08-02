@@ -32,6 +32,25 @@ run :)
 sudo nodemon server.js
 ```
 
+## SSL Configuration
+Votechain should run in a local network over encrypted connection using
+the SSL protocol. In order to setup your certificate files, follow
+these steps:
+
+In your terminal, type the following line to generate an RSA key:
+```
+openssl genrsa 1024 > file.pem
+```
+then, execute this command:
+```
+openssl req -new -key file.pem -out csr.pem
+```
+and finally:
+```
+openssl x509 -req -days 365 -in csr.pem -signkey file.pem -out file.crt
+```
+Votechain will then be able to load your certificate files and you'll be able to access the app by going to https://localhost:443
+
 ## Tech Stack
 Node JS/Express JS
 ES6 

@@ -1,5 +1,5 @@
 var votechain = [];
-let socket = io.connect('http://localhost:3000');
+let socket = io.connect('https://localhost:443', {secure: true});
 
 $(document).ready(function() { 
 

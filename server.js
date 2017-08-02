@@ -1,14 +1,20 @@
+const fs = require('fs');
+const https = require('https');
 const express = require('express');
 const app = express();
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
-const modularIo = require('./client/io.js')(io);
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const expressValidator = require('express-validator');
 const path = require('path');
-const port = process.env.PORT || 3000;
-const ROOT_URL = process.env.ROOT_URL || 'http://localhost:3000/';
+const port = process.env.PORT || 443;
+const httpsOptions = {
+	key: fs.readFileSync('./file.pem'),
+	cert: fs.readFileSync('./file.crt')
+};
+const server = https.createServer(httpsOptions, app);
+const io = require('socket.io')(server);
+const modularIo = require('./client/io.js')(io);
+
 
 /* 
  * Mongoose by default sets the auto_reconnect option to true.
@@ -17,7 +23,7 @@ const ROOT_URL = process.env.ROOT_URL || 'http://localhost:3000/';
  * plenty of time in most operating environments.
  */
 const options = { server: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } },
-                replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 } } };   
+                  replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 } } };   
 /* mongodb://vote:vote@ds133582.mlab.com:33582/vote */
 /* mongodb://localhost:27017/vote */
 let mongodbUri = 'mongodb://vote:vote@ds133582.mlab.com:33582/vote';

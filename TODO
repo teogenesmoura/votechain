@@ -1,5 +1,4 @@
-0 - create page to create voter
-	 -> sign up voter
+LATER:
 1 - create page to create election
 	-> posts 'election' endpoint with name of election, number and name of candidates
 2 - backend should:	
