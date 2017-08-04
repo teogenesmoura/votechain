@@ -22,7 +22,7 @@ clone this repo
 git clone https://github.com/teogenesmoura/votechain.git
 ``` 
 Install dependencies
-
+``` 
 npm install 
 ``` 
 Change the MongoDB connection URL to your URL
@@ -41,6 +41,7 @@ In your terminal, type the following line to generate an RSA key:
 ```
 openssl genrsa 1024 > file.pem
 ```
+
 then, execute this command:
 ```
 openssl req -new -key file.pem -out csr.pem
@@ -50,6 +51,8 @@ and finally:
 openssl x509 -req -days 365 -in csr.pem -signkey file.pem -out file.crt
 ```
 Votechain will then be able to load your certificate files and you'll be able to access the app by going to https://localhost:443
+credit goes to @Wilson on this Stack Overflow thread:
+https://stackoverflow.com/questions/31156884/how-to-use-https-on-node-js-using-express-socket-io/31165649
 
 ## Tech Stack
 Node JS/Express JS
