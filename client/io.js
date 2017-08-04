@@ -1,5 +1,9 @@
-/* TODO
- debug funcao de search da linked list, detalhes no console.log
+/* 
+	Ideally we'd store the votechains in a database instance (Mongo, for example), but considering that each vote
+	takes roughly 130 bytes of space, 1 GB of memory could store up to 7.69 million votes so introducing database
+	storage would be more costly in terms of project complexity than it'd mean in terms of overall gain. 
+	To put in perspective one could store Brazil's elections (~200 million votes) using 4 standard computers each 
+	with 8gbs of RAM.
 */
 let Election = require('../controllers/electionController');
 let request = require('request');
@@ -32,9 +36,7 @@ module.exports = function(io){
 	io.on('connection', function(socket){ 
 		currentNumberOfConnectedClients++;
 		//console.log("number of connected clients " + currentNumberOfConnectedClients);
-
 		socket.emit('connected', { message: "you're connected" });
-
 		socket.on('joinElection', function(obj) {
 			let electionExists = false;
 			if(obj === null) { 
@@ -66,14 +68,12 @@ module.exports = function(io){
 				});
 			}
 		});
-
 		socket.on("getCurrentVotechain", function(obj){
 			let electionRequested = obj.clientElectionRequested;
 			let votechainReceived = obj.clientCurrentVotechain;
 			let currentVotechainForGivenElection = getVotesForGivenElection(electionRequested);
 			socket.emit("ServerSendsVotechainToClient", { currentVotechain: currentVotechainForGivenElection });
 		});
-
 	  /**
 	  * returns a candidate vote and queries all clients connected to an election to validate that vote
 	  **/
@@ -88,7 +88,6 @@ module.exports = function(io){
 	  				}
 				});
 			});
-
 		socket.on("voteValidationStatus", function(obj){
    		if(obj.isVoteValid) {
    				let vote = prepareVoteToBePersisted(obj.validVote);
@@ -97,13 +96,10 @@ module.exports = function(io){
 					socket.emit("Peer ID not found");
 				}
 		});
-
-
 		socket.on('disconnect', function(socket){
 			currentNumberOfConnectedClients--;
 		});
 	});
-
 	function prepareVoteToBePersisted(vote) {
 		vote.id = shortid.generate();
 		vote.previousVote = updatePreviousVoteReference(vote);
@@ -112,29 +108,19 @@ module.exports = function(io){
 	function updatePreviousVoteReference(vote) {
 		let previousVote;
 		if(!previousVoteToElectionMap.has(vote.election)) {
-			console.log("entra em !previous...");
 			previousVoteToElectionMap.put(vote.election, vote.id);
 			previousVote = "Genesis Vote";
 		} else {
 			previousVote = previousVoteToElectionMap.get(vote.election);
-			console.log("entra aqui");
 			console.log("previousVote" + previousVote);
 			previousVoteToElectionMap.remove(vote.election);
 			previousVoteToElectionMap.put(vote.election, vote.id);
 		}
 		return previousVote;
 	}
-
 	function getVotesForGivenElection(electionRequested) {
 		return electionVotechainMap.get(electionRequested);
 	}
-
-	/**
-	* updates the index of Election -> List of votes with the new vote
-	* @params: electionRequested, voteToInsert
-	*/
-
-
 }
 
 		// socket.on("voteValidationStatus", function(obj){

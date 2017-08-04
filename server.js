@@ -14,8 +14,6 @@ const httpsOptions = {
 const server = https.createServer(httpsOptions, app);
 const io = require('socket.io')(server);
 const modularIo = require('./client/io.js')(io);
-
-
 /* 
  * Mongoose by default sets the auto_reconnect option to true.
  * We recommend setting socket options at both the server and replica set level.
@@ -26,7 +24,7 @@ const options = { server: { socketOptions: { keepAlive: 300000, connectTimeoutMS
                   replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 } } };   
 /* mongodb://vote:vote@ds133582.mlab.com:33582/vote */
 /* mongodb://localhost:27017/vote */
-let mongodbUri = 'mongodb://vote:vote@ds133582.mlab.com:33582/vote';
+let mongodbUri = 'mongodb://localhost:27017/vote';
 mongoose.connect(mongodbUri, options);
 let conn = mongoose.connection;             
 conn.on('error', console.error.bind(console, 'connection error:')); 

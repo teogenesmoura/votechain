@@ -13,14 +13,17 @@ router.route('/vote/:electionID')
 	  .get(vote.getVotesByElectionID);
 
 router.route('/election')
-	  //.post(election.createElection)
+	  .post(election.createElection)
 	  .get(election.getElection);
+	  
+router.route('/election/create')
+	  .get(election.getElectionCreationForm);
 
 router.route('/election/:electionName')
 	  .get(election.getElectionByName);
 
-router.route('/election/addVoter')
-	  .post(election.addVoterToElection);
+router.route('/election/addCandidate')
+	  .post(election.addCandidatesToElection);
 
 router.route('/election/castVote')
  	  .post(election.castVoteToCandidateInElection);

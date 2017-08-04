@@ -6,26 +6,37 @@ let votechainController = require('./votechainController');
 let voteController = require('./voteController');
 let voterController = require('./voterController');
 let async = require('async');
-
-
 /** initializes an election
+* @params: Parameters are in the body of req and are the following:
+* candidates (Array of Strings): name of candidates
+* name (String) : name of the election
+* voter (String) : encrypted representation of a voter e.g "61E_ZHCGAsEK-DtVAAAA"
 * @returns JSON document with the election created or error
 */
 function createElection(req, res) {
 	let election = new Election();
 	let votechain = new Votechain();
-	votechain.election = election;
-	votechain.save(function(err) {
-		election.name		= req.body.name;
-		election.voters		= [];
-		election.votechain  = votechain.id;
-		election.save(function(err) {
-			if(err) res.send(err);
-			res.json(election);
+		votechain.election = election;
+		votechain.save(function(err) {
+			election.name		= req.body.name;
+			election.votechain  = votechain.id;
+			election.save(function(err) {
+				if(err) { console.log(err); }
+				res.json(election);
+			});
 		});
-	});
+		addCandidatesToElection(req.body.name, req.body.candidates);
 }
 
+/** Mounts an array of Voter instances given the name of the candidates
+* @params: Array of Strings containing the name of the candidates e.g ["Barack Obama","George Bush"]
+* @returns: undefined if a candidate does not exist, Array of Voter instances otherwise e.g [VoterRef, VoterRef]
+*/
+function addCandidatesToElection(election, candidates) {
+	for(let i=0; i<candidates.length; i++) {
+		_addCandidateToElection(election, candidates[i]);
+	}
+}
 /** Retrieve election by name
 * @params: electionName
 * @returns: election JSON object if election exists, 'election not found' otherwise
@@ -43,8 +54,8 @@ function getElectionByName(req, res) {
 			if(r.election == null) {
 				res.send('election not found');
 			} else { 
-				res.render('electionRoom');
-							}
+				res.render('electionRoom', {election: r.election});
+			}
 		});
 }
 /**
@@ -57,6 +68,10 @@ function getElection(req, res) {
 		if(err) res.send(err);
 		res.json(elections);
 	}); 
+}
+
+function getElectionCreationForm(req, res) {
+	res.render('createElection');
 }
 
 function listElections(req, res) {
@@ -88,26 +103,26 @@ function listElections(req, res) {
 * @param {string} voterName - the unique name of the voter to add
 * @returns error if an error occurs or the new voter document hence the need of new: true
 */
-function addVoterToElection(req, res) {
+function _addCandidateToElection(electionName, candidateName) {
 	async.parallel(
 	{
 		voter: function(callback) {
-			Voter.findOne({ 'name' : req.body.voterName }, function(err,voter) {
+			Voter.findOne({ 'name' : candidateName }, function(err,voter) {
 				callback(err, voter);
 			});
 		}
 	},
 	function(e, r) {
 		if(r.voter === null){ 
-			res.send('Voter not found');
+			return 'Voter not found';
 		} else {
 		Election.findOneAndUpdate(
-			{'name': req.body.electionName },
-			{$push: { voters: r.voter }},
+			{'name': electionName },
+			{$push: { candidates: r.voter }},
 			{new: true},
 			function(err, voter) {
-				if(err) res.send(err);
-				res.send(voter);
+				if(err) return err;
+				return voter;
 					}
 				);
 			}
@@ -170,5 +185,5 @@ function getVotechainFromElection(req, res) {
 	let electionID = req.body.electionID;
 }
 module.exports = { createElection, getElection,
-				   addVoterToElection, castVoteToCandidateInElection,
-				   getElectionByName, listElections };
+				   addCandidatesToElection, castVoteToCandidateInElection,
+				   getElectionByName, listElections, getElectionCreationForm };

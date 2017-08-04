@@ -1,4 +1,5 @@
-let Voter = require('../models/voter');
+const Voter = require('../models/voter');
+const async = require('async');
 const expressValidator = require('express-validator');
 
 function postVoter(req, res) {
@@ -53,11 +54,22 @@ function getVoterByName(req, res) {
 function inputForm(req, res) {
 	res.render('voterSignUp');
 }
-function localGetVoterByName(name){
-	let q = Voter.findOne({ 'name' : req.body.name });
-	let voter = q.exec((err, voter) => {
-		if(err) return (err);
-		return (voter);
-	});
+function _getVoterByName(name){
+	console.log("em _getVoterByName name eh: " + name);
+		async.parallel(
+		{
+			voter: function(callback) {
+				Voter.findOne({'name' : name }, function(err,voter) {
+					callback(err, voter);
+				});
+			}
+		},
+		function(e, r) {
+			if(r.voter === null) {
+				return 'voter not found';
+			} else { 
+				return r.voter;
+			}
+		});
 }
-module.exports = { postVoter, getVoters, getVoterByName, localGetVoterByName, turnVoterIntoCandidate, inputForm }
+module.exports = { postVoter, getVoters, getVoterByName, _getVoterByName, turnVoterIntoCandidate, inputForm }
