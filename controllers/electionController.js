@@ -1,3 +1,4 @@
+//TODO: fix _addCandidateToElection, it's returning null when it shouldn't 
 let Election = require('../models/election');
 let Voter = require('../models/voter');
 let Vote = require('../models/vote');
