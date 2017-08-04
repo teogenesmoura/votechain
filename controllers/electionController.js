@@ -18,14 +18,16 @@ function createElection(req, res) {
 	let votechain = new Votechain();
 		votechain.election = election;
 		votechain.save(function(err) {
+			console.log("req.body.name " + req.body.name);
+			console.log("req.body.candidates" + req.body.candidates);
 			election.name		= req.body.name;
 			election.votechain  = votechain.id;
 			election.save(function(err) {
 				if(err) { console.log(err); }
-				res.json(election);
+				addCandidatesToElection(req.body.name, req.body.candidates);
+				console.log(election);
 			});
 		});
-		addCandidatesToElection(req.body.name, req.body.candidates);
 }
 
 /** Mounts an array of Voter instances given the name of the candidates
@@ -33,8 +35,12 @@ function createElection(req, res) {
 * @returns: undefined if a candidate does not exist, Array of Voter instances otherwise e.g [VoterRef, VoterRef]
 */
 function addCandidatesToElection(election, candidates) {
+	console.log("chega em addCandidatesToElection");
+	let result;
 	for(let i=0; i<candidates.length; i++) {
-		_addCandidateToElection(election, candidates[i]);
+		console.log("na iteracao "+ i + "candidato: " + candidates[i]);
+		result = _addCandidateToElection(election, candidates[i]);
+		console.log("result: " + result);
 	}
 }
 /** Retrieve election by name
@@ -104,26 +110,38 @@ function listElections(req, res) {
 * @returns error if an error occurs or the new voter document hence the need of new: true
 */
 function _addCandidateToElection(electionName, candidateName) {
+	console.log("entra em _addCandidateToElection com params: \n");
+	console.log("em _addCandidateToElection, electionName = " + electionName);
+	console.log("em _addCandidateToElection, candidateName = " + candidateName);
+
 	async.parallel(
 	{
 		voter: function(callback) {
 			Voter.findOne({ 'name' : candidateName }, function(err,voter) {
+				console.log("'name' " + candidateName + "\n");
+				console.log("em Voter.findOne: voter = " + voter);
 				callback(err, voter);
 			});
 		}
 	},
 	function(e, r) {
 		if(r.voter === null){ 
+			console.log("voter not found");
 			return 'Voter not found';
 		} else {
+			console.log("em _addCandidateToElection, r.voter = " + r.voter);
 		Election.findOneAndUpdate(
 			{'name': electionName },
 			{$push: { candidates: r.voter }},
 			{new: true},
 			function(err, voter) {
-				if(err) return err;
+				if(err){ 
+					console.log("em _addCandidateToElection entra em erro: " + err);
+					return err;
+				} 
+				console.log("nao entra em erro: voter = " + voter);
 				return voter;
-					}
+				}
 				);
 			}
 		}
