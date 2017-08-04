@@ -6,6 +6,7 @@ let votechainController = require('./votechainController');
 let voteController = require('./voteController');
 let voterController = require('./voterController');
 let async = require('async');
+
 /** initializes an election
 * @params: Parameters are in the body of req and are the following:
 * candidates (Array of Strings): name of candidates
@@ -16,32 +17,41 @@ let async = require('async');
 function createElection(req, res) {
 	let election = new Election();
 	let votechain = new Votechain();
+	if(!req.body.name) {
+		res.send("Invalid Election name");
+	} else {
 		votechain.election = election;
 		votechain.save(function(err) {
-			console.log("req.body.name " + req.body.name);
-			console.log("req.body.candidates" + req.body.candidates);
 			election.name		= req.body.name;
 			election.votechain  = votechain.id;
-			election.save(function(err) {
-				if(err) { console.log(err); }
-				addCandidatesToElection(req.body.name, req.body.candidates);
-				console.log(election);
-			});
+			if(addCandidatesToElection(req.body.name, req.body.candidates)) {
+				election.save(function(err) {
+					if(err) { res.send(err); }
+					res.json("election created sucessfully");
+				});
+			} else {
+					res.send("election not created sucessfully");
+			}
 		});
+	}
 }
-
 /** Mounts an array of Voter instances given the name of the candidates
 * @params: Array of Strings containing the name of the candidates e.g ["Barack Obama","George Bush"]
 * @returns: undefined if a candidate does not exist, Array of Voter instances otherwise e.g [VoterRef, VoterRef]
 */
 function addCandidatesToElection(election, candidates) {
-	console.log("chega em addCandidatesToElection");
-	let result;
+	// console.log("chega em addCandidatesToElection");
+	let temp;
+	let addedCandidatesSucessfully = true;
 	for(let i=0; i<candidates.length; i++) {
-		console.log("na iteracao "+ i + "candidato: " + candidates[i]);
-		result = _addCandidateToElection(election, candidates[i]);
-		console.log("result: " + result);
+		temp = _addCandidateToElection(election, candidates[i]);
+		console.log("temp " + temp);
+		if (!temp) {
+			addedCandidatesSucessfully = false;
+		}
 	}
+	console.log("addedCandidatesSucessfully" + addedCandidatesSucessfully);
+	return addedCandidatesSucessfully;
 }
 /** Retrieve election by name
 * @params: electionName
@@ -110,10 +120,9 @@ function listElections(req, res) {
 * @returns error if an error occurs or the new voter document hence the need of new: true
 */
 function _addCandidateToElection(electionName, candidateName) {
-	console.log("entra em _addCandidateToElection com params: \n");
-	console.log("em _addCandidateToElection, electionName = " + electionName);
-	console.log("em _addCandidateToElection, candidateName = " + candidateName);
-
+	// console.log("entra em _addCandidateToElection com params: \n");
+	// console.log("em _addCandidateToElection, electionName = " + electionName);
+	// console.log("em _addCandidateToElection, candidateName = " + candidateName);
 	async.parallel(
 	{
 		voter: function(callback) {
@@ -126,20 +135,20 @@ function _addCandidateToElection(electionName, candidateName) {
 	},
 	function(e, r) {
 		if(r.voter === null){ 
-			console.log("voter not found");
+			//console.log("voter not found");
 			return 'Voter not found';
 		} else {
-			console.log("em _addCandidateToElection, r.voter = " + r.voter);
+			//console.log("em _addCandidateToElection, r.voter = " + r.voter);
 		Election.findOneAndUpdate(
 			{'name': electionName },
 			{$push: { candidates: r.voter }},
 			{new: true},
 			function(err, voter) {
 				if(err){ 
-					console.log("em _addCandidateToElection entra em erro: " + err);
+					//console.log("em _addCandidateToElection entra em erro: " + err);
 					return err;
 				} 
-				console.log("nao entra em erro: voter = " + voter);
+				//console.log("nao entra em erro: voter = " + voter);
 				return voter;
 				}
 				);
