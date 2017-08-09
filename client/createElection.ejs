@@ -166,19 +166,24 @@
       let candidates = [];
       let electionName;
 
+
       $(createElectionButton).click(function(e) {
         e.preventDefault();
         getCandidatesFromInput();
         getElectionNameFromInput();
-        postCandidates(candidates,electionName);
+        postCandidates(electionName,candidates);
       });
 
       $(addButton).click(function(e) {
         e.preventDefault();
+        e.stopPropagation();
         var newAdd = '<br><div id=div-'+counter+'><input type="text" name="text[]" class="candidateInputField form-control"><a href="#" class="remove_field">Remove</a></div>';
         var el = $('.input_wrap');
-      $(el).after(newAdd);
-      counter++;
+        $(el).after(newAdd);
+        counter++;
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
       });
       
       function getElectionNameFromInput() {
@@ -196,13 +201,27 @@
         console.log(candidates);
       }
 
-      function postCandidates(candidates, electionName) {
-        let url = '/election';
-        let postRequest = $.post( url, {candidates: candidates, name: electionName });
-          postRequest.done(function(response) {
-            console.log(response);
-          });
+      function postCandidates(electionName, candidates) {
+        let obj = {'name': electionName, 'candidates': candidates};
+        console.log("electionName" + electionName + " candidates " + candidates);
+        console.log("obj: " + obj);
+        postReqWrapper(obj);
       }
 
-    </script>
+      function postReqWrapper(obj) {
+        let postRequest;
+        if(!obj['name']) {
+          return "empty election name or url, please provide one";
+        }
+        postRequest = $.post('/election', {electionName: obj['name']});
+        postRequest.done(function(response) { console.log(response); });
+        if(obj['candidates']) {
+          postRequest = $.post('/election/addCandidatesToElection', {electionName: obj['name'], candidates: obj['candidates']});
+          postRequest.done(function(response) {
+            console.log(response);
+        }); 
+      }
+    } 
+         
+</script>
 </html>

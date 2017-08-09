@@ -16,10 +16,3 @@ $(document).ready(function() {
 	  });
 });
 
-let postCandidates = function postCandidates(candidates, electionName) {
-	let url = '/election';
-	let postRequest = $.post( url, {candidates: candidates, electionName: electionName });
-	postRequest.done(function(response) {
-  	console.log(response);
-	});
-}

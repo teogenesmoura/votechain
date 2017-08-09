@@ -22,7 +22,7 @@ router.route('/election/create')
 router.route('/election/:electionName')
 	  .get(election.getElectionByName);
 
-router.route('/election/addCandidate')
+router.route('/election/addCandidatesToElection')
 	  .post(election.addCandidatesToElection);
 
 router.route('/election/castVote')

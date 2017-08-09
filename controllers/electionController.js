@@ -18,42 +18,31 @@ let async = require('async');
 function createElection(req, res) {
 	let election = new Election();
 	let votechain = new Votechain();
-	if(!req.body.name) {
+	if(!req.body.electionName) {
 		res.send("Invalid Election name");
 	} else {
 		votechain.election = election;
 		votechain.save(function(err) {
-			election.name		= req.body.name;
+			election.name		= req.body.electionName;
 			election.votechain  = votechain.id;
-			if(addCandidatesToElection(req.body.name, req.body.candidates)) {
-				election.save(function(err) {
-					if(err) { res.send(err); }
-					res.json("election created sucessfully");
-				});
-			} else {
-					res.send("election not created sucessfully");
-			}
+			election.save(function(err) {
+				if(err) { res.send(err); }
+				res.send("createElection sucess");
+			});	
 		});
 	}
 }
-/** Mounts an array of Voter instances given the name of the candidates
-* @params: Array of Strings containing the name of the candidates e.g ["Barack Obama","George Bush"]
-* @returns: undefined if a candidate does not exist, Array of Voter instances otherwise e.g [VoterRef, VoterRef]
-*/
-function addCandidatesToElection(election, candidates) {
-	// console.log("chega em addCandidatesToElection");
-	let temp;
-	let addedCandidatesSucessfully = true;
-	for(let i=0; i<candidates.length; i++) {
-		temp = _addCandidateToElection(election, candidates[i]);
-		console.log("temp " + temp);
-		if (!temp) {
-			addedCandidatesSucessfully = false;
-		}
-	}
-	console.log("addedCandidatesSucessfully" + addedCandidatesSucessfully);
-	return addedCandidatesSucessfully;
-}
+// function createElectionAndAddCandidates(req, res) {
+// 	let p = new Promise(function(resolve,reject) {
+
+// 	});
+
+// 	let p = new Promise.resolve(createElection(req,res)).then(function(value) {
+// 		let result = addCandidatesToElection(req.body.name, req.body.candidates);
+// 		res.send(JSON.stringify(result));
+// 	});
+// }
+
 /** Retrieve election by name
 * @params: electionName
 * @returns: election JSON object if election exists, 'election not found' otherwise
@@ -114,6 +103,19 @@ function listElections(req, res) {
 	);
 	
 }
+/** Mounts an array of Voter instances given the name of the candidates
+* @params: Array of Strings containing the name of the candidates e.g ["Barack Obama","George Bush"]
+* @returns: undefined if a candidate does not exist, Array of Voter instances otherwise e.g [VoterRef, VoterRef]
+*/
+function addCandidatesToElection(req, res) {
+	let electionName = req.body.electionName;
+	let candidates = req.body.candidates;
+	let addedCandidatesSucessfully = true;
+	for(let i=0; i<candidates.length; i++) {
+		_addCandidateToElection(electionName, candidates[i]);
+	}
+	res.send("atingiu fim de addCandidatesToElection");
+}
 /**
 * Adds a voter to an Election
 * @param {string} electionName - the name of the election receiving the voter
@@ -121,9 +123,6 @@ function listElections(req, res) {
 * @returns error if an error occurs or the new voter document hence the need of new: true
 */
 function _addCandidateToElection(electionName, candidateName) {
-	// console.log("entra em _addCandidateToElection com params: \n");
-	// console.log("em _addCandidateToElection, electionName = " + electionName);
-	// console.log("em _addCandidateToElection, candidateName = " + candidateName);
 	async.parallel(
 	{
 		voter: function(callback) {
@@ -135,11 +134,11 @@ function _addCandidateToElection(electionName, candidateName) {
 		}
 	},
 	function(e, r) {
+		console.log("r.voter" + r.voter);
 		if(r.voter === null){ 
 			//console.log("voter not found");
 			return 'Voter not found';
 		} else {
-			//console.log("em _addCandidateToElection, r.voter = " + r.voter);
 		Election.findOneAndUpdate(
 			{'name': electionName },
 			{$push: { candidates: r.voter }},
@@ -212,6 +211,7 @@ function castVoteToCandidateInElection(req, res) {
 function getVotechainFromElection(req, res) {
 	let electionID = req.body.electionID;
 }
+//createElectionAndAddCandidates
 module.exports = { createElection, getElection,
 				   addCandidatesToElection, castVoteToCandidateInElection,
 				   getElectionByName, listElections, getElectionCreationForm };
