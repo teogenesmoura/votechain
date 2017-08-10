@@ -95,9 +95,16 @@ function exportJSON(el) {
       el.setAttribute("download", "data.json");     
     }
 }
-function isElectionActive(election) {
-
-  
+function isElectionActive(el) {
+  let url = "/election/isActive";
+  let postRequest = $.post(url, {electionName: mElection});
+  postRequest.done(function(response) {
+    if(JSON.stringify(response) === 'active'){
+      alert("Election still ongoing");
+    } else {
+      exportJSON(el);
+    }
+  });
 }
 /** credits for the functions below go to @RandyMohan on https://stackoverflow.com/questions/3486465/is-there-a-way-to-encrypt-in-jquery **/
 function Encrypt(str) {

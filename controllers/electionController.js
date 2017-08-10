@@ -214,9 +214,9 @@ function castVoteToCandidateInElection(req, res) {
 function isElectionActive(req,res) {
 	Election.findOne({'name': req.body.electionName}).then(function(election) {
 		if(election.isActive) {
-			res.send(true);
+			res.json("active");
 		} else {
-			res.send(false);
+			res.json("not active");
 		}
 	});
 }
