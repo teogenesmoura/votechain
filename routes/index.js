@@ -19,6 +19,9 @@ router.route('/election')
 router.route('/election/create')
 	  .get(election.getElectionCreationForm);
 
+router.route('/election/isActive')
+	  .post(election.isElectionActive);
+
 router.route('/election/:electionName')
 	  .get(election.getElectionByName);
 

@@ -137,6 +137,8 @@
                             </form>
                             <button class="createElectionButton btn btn-primary">Create Election!</button>
                           </div>
+                          <div class="sucessOrFail">
+                          </div>
                         </div>
                   </div>
               </div>
@@ -204,21 +206,36 @@
       function postCandidates(electionName, candidates) {
         let obj = {'name': electionName, 'candidates': candidates};
         console.log("electionName" + electionName + " candidates " + candidates);
-        console.log("obj: " + obj);
         postReqWrapper(obj);
       }
-
+      /* Should be refactored on server side code so that it uses a Promise to handle 
+      both election creation and adding candidates instead of 2 POST requests */
       function postReqWrapper(obj) {
         let postRequest;
         if(!obj['name']) {
           return "empty election name or url, please provide one";
         }
         postRequest = $.post('/election', {electionName: obj['name']});
-        postRequest.done(function(response) { console.log(response); });
+        postRequest.done(function(response) {  
+          if(!obj['candidates']) {  
+            console.log(response + "entra em sem candidates");         
+            if(response === "createElection sucess") {
+               $('.sucessOrFail').after('<p class="text-success"> Election created sucessfully</p>');
+              } else {
+              $('.sucessOrFail').after('<p class="text-danger"> Election not created sucessfully</p>');
+              } 
+            }
+          });
         if(obj['candidates']) {
+          console.log("entra em obj['candidates']");
           postRequest = $.post('/election/addCandidatesToElection', {electionName: obj['name'], candidates: obj['candidates']});
           postRequest.done(function(response) {
-            console.log(response);
+            console.log("entra aqui postRequest" + response);
+            if(response === "Election created sucessfully") {
+              $('.sucessOrFail').after('<p class="text-success"> Election created sucessfully</p>');
+            } else {
+              $('.sucessOrFail').after('<p class="text-danger"> Election not created sucessfully</p>');
+            }
         }); 
       }
     } 

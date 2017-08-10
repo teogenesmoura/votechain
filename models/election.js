@@ -3,6 +3,7 @@ let Schema = mongoose.Schema;
 
 let electionSchema = new Schema({
     name	   : String,
+    isActive   : Boolean,
     candidates	   : [{	type: Schema.Types.ObjectId, ref: 'Voter'}],
     votechain 	   : { type: Schema.Types.ObjectId, ref: 'Votechain' }
 });

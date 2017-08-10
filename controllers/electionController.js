@@ -8,7 +8,7 @@ let voteController = require('./voteController');
 let voterController = require('./voterController');
 let async = require('async');
 
-/** initializes an election
+/** initializes an election. Elections are considered active by default.
 * @params: Parameters are in the body of req and are the following:
 * candidates (Array of Strings): name of candidates
 * name (String) : name of the election
@@ -25,23 +25,14 @@ function createElection(req, res) {
 		votechain.save(function(err) {
 			election.name		= req.body.electionName;
 			election.votechain  = votechain.id;
+			election.isActive = true;
 			election.save(function(err) {
 				if(err) { res.send(err); }
-				res.send("createElection sucess");
+				res.send("createElection success");
 			});	
 		});
 	}
 }
-// function createElectionAndAddCandidates(req, res) {
-// 	let p = new Promise(function(resolve,reject) {
-
-// 	});
-
-// 	let p = new Promise.resolve(createElection(req,res)).then(function(value) {
-// 		let result = addCandidatesToElection(req.body.name, req.body.candidates);
-// 		res.send(JSON.stringify(result));
-// 	});
-// }
 
 /** Retrieve election by name
 * @params: electionName
@@ -101,20 +92,45 @@ function listElections(req, res) {
 			}
 		}
 	);
-	
+}
+/** Receives the name of the candidate and returns it's Voter instance
+* @params (String): candidateName
+* @returns: Promise containing the Voter object or error
+**/
+function findVoter(candidateName) {
+	return new Promise(function(resolve,reject) {
+		Voter.findOne({'name': candidateName}, function(err,voter) {
+			if(err || !voter) {
+				reject(err);
+			} else {
+				resolve(voter);
+			}
+		});
+	});
 }
 /** Mounts an array of Voter instances given the name of the candidates
-* @params: Array of Strings containing the name of the candidates e.g ["Barack Obama","George Bush"]
-* @returns: undefined if a candidate does not exist, Array of Voter instances otherwise e.g [VoterRef, VoterRef]
-*/
-function addCandidatesToElection(req, res) {
-	let electionName = req.body.electionName;
-	let candidates = req.body.candidates;
-	let addedCandidatesSucessfully = true;
-	for(let i=0; i<candidates.length; i++) {
-		_addCandidateToElection(electionName, candidates[i]);
-	}
-	res.send("atingiu fim de addCandidatesToElection");
+* @params: 
+* candidateName - Array of Strings containing the name of the candidates e.g ["Barack Obama","George Bush"]
+* electionName - String containing the name of the election to witch persist candidates
+* @returns: Promise with Election instance created
+**/
+
+function addCandidateToElection(electionName, candidateName) {
+	return findVoter(candidateName).then(function(voter) {
+		return new Promise(function(resolve,reject) {
+			Election.findOneAndUpdate(
+				{'name' : electionName},
+				{$push: {candidates : voter }},
+				{new: true},
+				function(err, election) {
+					if(err) {
+						reject(err);
+					} else {
+						resolve(!!election);
+					}
+				});
+			});
+		});
 }
 /**
 * Adds a voter to an Election
@@ -122,40 +138,25 @@ function addCandidatesToElection(req, res) {
 * @param {string} voterName - the unique name of the voter to add
 * @returns error if an error occurs or the new voter document hence the need of new: true
 */
-function _addCandidateToElection(electionName, candidateName) {
-	async.parallel(
-	{
-		voter: function(callback) {
-			Voter.findOne({ 'name' : candidateName }, function(err,voter) {
-				console.log("'name' " + candidateName + "\n");
-				console.log("em Voter.findOne: voter = " + voter);
-				callback(err, voter);
-			});
-		}
-	},
-	function(e, r) {
-		console.log("r.voter" + r.voter);
-		if(r.voter === null){ 
-			//console.log("voter not found");
-			return 'Voter not found';
-		} else {
-		Election.findOneAndUpdate(
-			{'name': electionName },
-			{$push: { candidates: r.voter }},
-			{new: true},
-			function(err, voter) {
-				if(err){ 
-					//console.log("em _addCandidateToElection entra em erro: " + err);
-					return err;
-				} 
-				//console.log("nao entra em erro: voter = " + voter);
-				return voter;
-				}
-				);
-			}
-		}
-	);
+function addCandidatesToElection(req,res) {
+	let electionName = req.body.electionName;
+	let candidates = req.body.candidates;
+	let addedCandidatesSucessfully = true;
+	let candidatePromiseArray = [];
+	for(let i=0;i<candidates.length;i++) {
+		candidatePromiseArray.push(addCandidateToElection(electionName, candidates[i]));
+	}
+	Promise.all(candidatePromiseArray)
+	.then(function(results) {
+		console.log(results);
+		res.send("Election created sucessfully");
+	})
+	.catch(function(error) {
+		console.log("entrou em error:" + error);
+		res.send("Election not created sucessfully");
+	});
 }
+
 /**
 * Casts a vote to a candidate in a given election
 * @param {string} req.body.election - the name of the election receiving the vote
@@ -204,6 +205,20 @@ function castVoteToCandidateInElection(req, res) {
 	);
 }
 /**
+* Receives an election name through req.body.electionName and returns whether it is active or not
+* @param {String} req.body.electionName - the name of given Election
+* @returns true if election is active, false otherwise
+*/
+function isElectionActive(req, res) {
+	Election.findOne({'name': req.body.electionName}).then(function(election) {
+		if(election.isActive) {
+			res.send(true);
+		} else {
+			res.send(false);
+		}
+	});
+}
+/**
 * Gets a chain of votes linked to a given election 
 * @param {Number} req.body.electionID - the ID of the given Election
 * @returns error if an error occur or the votechain instance requested
@@ -212,6 +227,6 @@ function getVotechainFromElection(req, res) {
 	let electionID = req.body.electionID;
 }
 //createElectionAndAddCandidates
-module.exports = { createElection, getElection,
-				   addCandidatesToElection, castVoteToCandidateInElection,
-				   getElectionByName, listElections, getElectionCreationForm };
+module.exports = { createElection, getElection,	addCandidatesToElection,
+							 		 castVoteToCandidateInElection, getElectionByName, 
+							 		 listElections, getElectionCreationForm, isElectionActive };

@@ -54,7 +54,7 @@ $(document).ready(function() {
   socket.on("persistVote", function(obj) {
     //console.log("persistVote" + obj.voteToPersist);
     let voteToPersistToVotechain = obj.voteToPersist;
-    $('.votechainLog').append("<tr><td>" + JSON.stringify(obj.voteToPersist.candidate) + "</td><td>"
+    $('.votechainLog').append("<tr><td>" + JSON.stringify(Encrypt(obj.voteToPersist.candidate)) + "</td><td>"
                               + JSON.stringify(obj.voteToPersist.voter) + "</td></tr>");
     votechain.push(voteToPersistToVotechain);
     printVotechain();
@@ -87,7 +87,51 @@ function getVotechain(){
     return JSON.stringify(votechain);
 }
 function exportJSON(el) {
-    var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(votechain));
-    el.setAttribute("href", "data:"+data);
-    el.setAttribute("download", "data.json");
+    if(isElectionActive(mElection)) {
+      alert("This election is still ongoing. Please try again later");
+    } else {
+      var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(votechain));
+      el.setAttribute("href", "data:"+data);
+      el.setAttribute("download", "data.json");     
+    }
 }
+function isElectionActive(election) {
+  
+  
+}
+/** credits for the functions below go to @RandyMohan on https://stackoverflow.com/questions/3486465/is-there-a-way-to-encrypt-in-jquery **/
+function Encrypt(str) {
+    if (!str) str = "";
+    str = (str == "undefined" || str == "null") ? "" : str;
+    try {
+        var key = 146;
+        var pos = 0;
+        ostr = '';
+        while (pos < str.length) {
+            ostr = ostr + String.fromCharCode(str.charCodeAt(pos) ^ key);
+            pos += 1;
+        }
+
+        return ostr;
+    } catch (ex) {
+        return '';
+    }
+}
+// function Decrypt(str) {
+//     if (!str) str = "";
+//     str = (str == "undefined" || str == "null") ? "" : str;
+//     try {
+//         var key = 146;
+//         var pos = 0;
+//         ostr = '';
+//         while (pos < str.length) {
+//             ostr = ostr + String.fromCharCode(key ^ str.charCodeAt(pos));
+//             pos += 1;
+//         }
+
+//         return ostr;
+//     } catch (ex) {
+//         return '';
+//     }
+// }
+
