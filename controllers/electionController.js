@@ -156,7 +156,9 @@ function addCandidatesToElection(req,res) {
 		res.send("Election not created sucessfully");
 	});
 }
-
+function changeElectionStatus(req,res) {
+	let electionName = req.body.electionName;
+}
 /**
 * Casts a vote to a candidate in a given election
 * @param {string} req.body.election - the name of the election receiving the vote
@@ -209,7 +211,7 @@ function castVoteToCandidateInElection(req, res) {
 * @param {String} req.body.electionName - the name of given Election
 * @returns true if election is active, false otherwise
 */
-function isElectionActive(req, res) {
+function isElectionActive(req,res) {
 	Election.findOne({'name': req.body.electionName}).then(function(election) {
 		if(election.isActive) {
 			res.send(true);

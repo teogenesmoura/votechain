@@ -96,7 +96,7 @@ function exportJSON(el) {
     }
 }
 function isElectionActive(election) {
-  
+
   
 }
 /** credits for the functions below go to @RandyMohan on https://stackoverflow.com/questions/3486465/is-there-a-way-to-encrypt-in-jquery **/

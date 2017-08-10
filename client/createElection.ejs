@@ -168,7 +168,6 @@
       let candidates = [];
       let electionName;
 
-
       $(createElectionButton).click(function(e) {
         e.preventDefault();
         getCandidatesFromInput();
@@ -231,7 +230,7 @@
           postRequest = $.post('/election/addCandidatesToElection', {electionName: obj['name'], candidates: obj['candidates']});
           postRequest.done(function(response) {
             console.log("entra aqui postRequest" + response);
-            if(response === "Election created sucessfully") {
+            if(response === "Election created sucessfully ") {
               $('.sucessOrFail').after('<p class="text-success"> Election created sucessfully</p>');
             } else {
               $('.sucessOrFail').after('<p class="text-danger"> Election not created sucessfully</p>');
