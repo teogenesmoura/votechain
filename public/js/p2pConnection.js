@@ -87,20 +87,18 @@ function getVotechain(){
     return JSON.stringify(votechain);
 }
 function exportJSON(el) {
-    if(isElectionActive(mElection)) {
-      alert("This election is still ongoing. Please try again later");
-    } else {
-      var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(votechain));
-      el.setAttribute("href", "data:"+data);
-      el.setAttribute("download", "data.json");     
-    }
+  let data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(votechain));
+  el.setAttribute("href", "data:" + data);
+  el.setAttribute("download", "data.json");     
 }
 function isElectionActive(el) {
   let url = "/election/isActive";
   let postRequest = $.post(url, {electionName: mElection});
+  console.log("electionName: " + mElection);
   postRequest.done(function(response) {
-    if(JSON.stringify(response) === 'active'){
-      alert("Election still ongoing");
+    console.log("response" + response);
+    if(response === "active"){
+      alert("Election still ongoing, cannot download blockchain yet");
     } else {
       exportJSON(el);
     }

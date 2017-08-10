@@ -21,6 +21,9 @@ router.route('/election/create')
 
 router.route('/election/isActive')
 	  .post(election.isElectionActive);
+	  
+router.route('/election/changeElectionStatus')
+	  .post(election.changeElectionStatus);
 
 router.route('/election/:electionName')
 	  .get(election.getElectionByName);

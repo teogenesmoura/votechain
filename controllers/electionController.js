@@ -156,8 +156,49 @@ function addCandidatesToElection(req,res) {
 		res.send("Election not created sucessfully");
 	});
 }
+
+function findElection(electionName) {
+	return new Promise(function(resolve, reject) {
+		Election.findOne({'name': electionName}, function(err, election) {
+			if(err) {
+				reject(err);
+			} else {
+				resolve(election);
+			}
+		});
+	});
+}
+
+function _changeElectionStatus(electionName) {
+	return findElection(electionName).then(function(election) {
+		return new Promise(function(resolve, reject) {
+			election.isActive = !(election.isActive);
+			election.save(function(err) {
+				if(err) {
+					reject(err);
+				} else {
+					resolve(election);
+				}
+			});
+		});
+	});
+}
+/**
+* Changes isActive status of an election
+* @params {String} : electionName
+* @returns {Obj}: new election object if sucessfull, error message otherwise
+* TODO: add authentication so that only the user that created the election 
+* is able to change it's status
+*/
 function changeElectionStatus(req,res) {
 	let electionName = req.body.electionName;
+	_changeElectionStatus(electionName)
+	.then(function(election) {
+		res.json({'electionName': electionName, 'isActive' : election.isActive});
+	})
+	.catch(function(err) {
+		res.json('error while changing the status of the election');
+	});
 }
 /**
 * Casts a vote to a candidate in a given election
@@ -229,6 +270,7 @@ function getVotechainFromElection(req, res) {
 	let electionID = req.body.electionID;
 }
 //createElectionAndAddCandidates
-module.exports = { createElection, getElection,	addCandidatesToElection,
-							 		 castVoteToCandidateInElection, getElectionByName, 
-							 		 listElections, getElectionCreationForm, isElectionActive };
+module.exports = { createElection,changeElectionStatus, getElection,
+								 	 addCandidatesToElection, castVoteToCandidateInElection, 
+								 	 getElectionByName,listElections, getElectionCreationForm,
+								 	 isElectionActive };
