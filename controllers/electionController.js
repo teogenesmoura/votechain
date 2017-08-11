@@ -7,7 +7,6 @@ let votechainController = require('./votechainController');
 let voteController = require('./voteController');
 let voterController = require('./voterController');
 let async = require('async');
-
 /** initializes an election. Elections are considered active by default.
 * @params: Parameters are in the body of req and are the following:
 * candidates (Array of Strings): name of candidates
@@ -156,33 +155,6 @@ function addCandidatesToElection(req,res) {
 		res.send("Election not created sucessfully");
 	});
 }
-
-function findElection(electionName) {
-	return new Promise(function(resolve, reject) {
-		Election.findOne({'name': electionName}, function(err, election) {
-			if(err) {
-				reject(err);
-			} else {
-				resolve(election);
-			}
-		});
-	});
-}
-
-function _changeElectionStatus(electionName) {
-	return findElection(electionName).then(function(election) {
-		return new Promise(function(resolve, reject) {
-			election.isActive = !(election.isActive);
-			election.save(function(err) {
-				if(err) {
-					reject(err);
-				} else {
-					resolve(election);
-				}
-			});
-		});
-	});
-}
 /**
 * Changes isActive status of an election
 * @params {String} : electionName
@@ -200,6 +172,34 @@ function changeElectionStatus(req,res) {
 		res.json('error while changing the status of the election');
 	});
 }
+
+function _changeElectionStatus(electionName) {
+	return findElection(electionName).then(function(election) {
+		return new Promise(function(resolve, reject) {
+			election.isActive = !(election.isActive);
+			election.save(function(err) {
+				if(err) {
+					reject(err);
+				} else {
+					resolve(election);
+				}
+			});
+		});
+	});
+}
+
+function findElection(electionName) {
+	return new Promise(function(resolve, reject) {
+		Election.findOne({'name': electionName}, function(err, election) {
+			if(err) {
+				reject(err);
+			} else {
+				resolve(election);
+			}
+		});
+	});
+}
+
 /**
 * Casts a vote to a candidate in a given election
 * @param {string} req.body.election - the name of the election receiving the vote

@@ -17,6 +17,7 @@ let currentNumberOfConnectedClients = 0;
 let currentNumberOfValidatedVotes = 0;
 let HashTable = require('hashtable');
 let previousVoteToElectionMap = new HashTable();
+let thirdPartyAPIURL = process.env.thirdPartyAPI || 'http://localhost:5000/thirdParty/persistVote';
 // var { linkedList } = require('./LinkedList');
 // var nodesThatNeedToValidateVote = new linkedList();
 
@@ -43,7 +44,6 @@ module.exports = function(io){
 				socket.emit('obj was null');
 		  }	else {
 				let requestURL = ROOT_URL + '/election/' + obj.electionRequested;
-
 				/* checks if the election requested is already indexed by the application */
 				if(!electionVotechainMap.get(obj.electionRequested)) {
 					electionVotechainMap.set(obj.electionRequested, []);
@@ -91,6 +91,7 @@ module.exports = function(io){
 		socket.on("voteValidationStatus", function(obj){
    		if(obj.isVoteValid) {
    				let vote = prepareVoteToBePersisted(obj.validVote);
+   				persistVote3rdPartyAPI(vote);
 					socket.emit("persistVote", {voteToPersist: vote });
 				} else {
 					socket.emit("Peer ID not found");
@@ -100,6 +101,18 @@ module.exports = function(io){
 			currentNumberOfConnectedClients--;
 		});
 	});
+	function persistVote3rdPartyAPI(vote) {
+		request.post(
+    	thirdPartyAPIURL,
+    	{ json: { 'vote' : vote } },
+    	function (error, response, body) {
+         console.log("persistVote3rdPartyAPI"+body);
+
+        if (!error && response.statusCode == 200) {
+        }
+    }
+	);
+	}
 	function prepareVoteToBePersisted(vote) {
 		vote.id = shortid.generate();
 		vote.previousVote = updatePreviousVoteReference(vote);

@@ -96,7 +96,6 @@ function isElectionActive(el) {
   let postRequest = $.post(url, {electionName: mElection});
   console.log("electionName: " + mElection);
   postRequest.done(function(response) {
-    console.log("response" + response);
     if(response === "active"){
       alert("Election still ongoing, cannot download blockchain yet");
     } else {
