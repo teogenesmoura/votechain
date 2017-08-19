@@ -219,7 +219,7 @@
           if(!obj['candidates']) {  
             console.log(response + "entra em sem candidates");         
             if(response === "createElection sucess") {
-               $('.sucessOrFail').after('<p class="text-success"> Election created sucessfully</p>');
+               $('.sucessOrFail').after('<p class="text-success">Election created sucessfully</p> <a href="/election/' + electionName + '> Click Here to acess it</a>');
               } else {
               $('.sucessOrFail').after('<p class="text-danger"> Election not created sucessfully</p>');
               } 
@@ -231,9 +231,8 @@
           postRequest.done(function(response) {
             console.log("entra aqui postRequest" + response);
             if(response === "Election created sucessfully") {
-              $('.sucessOrFail').after('<p class="text-success"> Election created sucessfully</p>');
-            } else {
-              $('.sucessOrFail').after('<p class="text-danger"> Election not created sucessfully</p>');
+            $('.sucessOrFail').after('<p class="text-success">Election created sucessfully</p> <a href="/election/' + electionName + '> Click Here to acess it</a>');            } else {
+               $('.sucessOrFail').after('<p class="text-danger"> Election not created sucessfully</p>');
             }
         }); 
       }

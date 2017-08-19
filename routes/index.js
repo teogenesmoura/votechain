@@ -39,7 +39,7 @@ router.route('/voter')
 	  .put(voter.turnVoterIntoCandidate)
 	  .get(voter.getVoters);
 
-router.route('/voterSignUp')
+router.route('/voter/signup')
 	  .get(voter.inputForm);
 
 router.route('/voter/:name')
