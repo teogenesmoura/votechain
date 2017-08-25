@@ -4,20 +4,26 @@ const expressValidator = require('express-validator');
 
 function postVoter(req, res) {
 	let voter = new Voter();
-	req.assert('email', 'Email is not valid').isEmail();
-	req.assert('password', 'password must be at least 4 characters long').len(4);
-	req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
-	req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
+	_handleErrors(req,res,"postVoter");
+	console.log("req.body.name " + req.body.name);
+	console.log("req.body.password " + req.body.password );
+	console.log("req.body.email " + req.body.email);
 	voter.name = req.body.name;
 	voter.password = req.body.password;
 	voter.isCandidate = false;
+	voter.email = req.body.email;
 
 	Voter.findOne({ email: req.body.email }, (err, existingUser) => {
 		if(err) res.send(err);
 		if(existingUser) res.send('voter already exists');
 		voter.save(function(err) {
-			if(err) res.send(err);
-			res.send(voter);
+			if(err) {
+				console.log(err);
+				res.send(err);
+			} else { 
+				console.log("voter.name " + voter.name);
+				res.json({"name": voter.name});
+			 }
 		});
 	});
 }
@@ -71,5 +77,19 @@ function _getVoterByName(name){
 				return r.voter;
 			}
 		});
+}
+function _handleErrors(req,res,originMethod) {
+	if(originMethod === "postVoter") {
+		if(!req.assert('email', 'Email is not valid').isEmail()) {
+			res.json({"message" : "email not valid" });
+		}
+		if(!req.assert('password', 'password must be at least 4 characters long').len(4)) {
+			res.json({'message': "password should be at least 4 characters long" });
+		}
+		if(!req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password)) {
+			res.json({"message": "passwords do not match"});
+		}
+		req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
+	}
 }
 module.exports = { postVoter, getVoters, getVoterByName, _getVoterByName, turnVoterIntoCandidate, inputForm }
