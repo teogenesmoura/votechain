@@ -10,7 +10,7 @@ chai.use(require('chai-json-schema'));
 
 describe('get Votes', () => {
     it('should get votes', (done) => {
-        chai.request('http://localhost:3000')
+        chai.request('https://localhost')
             .get('/vote')
             .end(function (err, res) {    
                 expect(err).to.be.null;
@@ -23,7 +23,7 @@ describe('get Votes', () => {
       let electionData = {
         name: 'election1'
       };
-      chai.request('http://localhost:3000')
+      chai.request('https://localhost')
           .post('/election', electionData)
           .end(function(err, res) {
             expect(err).to.be.null;
@@ -50,7 +50,7 @@ describe('get Votes', () => {
           }
         }
       };
-      chai.request('http://localhost:3000')
+      chai.request('https://localhost')
           .get('/votechain')
           .end(function(err, res) {
             expect(err).to.be.null;
@@ -65,7 +65,7 @@ describe('get Votes', () => {
         voter: 'teogenes',
         candidate: 'Barack Obama'
       };
-      chai.request('http://localhost:3000')
+      chai.request('https://localhost')
           .post('/election/castVote')
           .end(function(err, res) {
             expect(err).to.be.null;
