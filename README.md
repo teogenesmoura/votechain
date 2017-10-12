@@ -54,6 +54,7 @@ Votechain will then be able to load your certificate files and you'll be able to
 credit goes to @Wilson on this Stack Overflow thread:
 https://stackoverflow.com/questions/31156884/how-to-use-https-on-node-js-using-express-socket-io/31165649
 
+P.S: It may ask for certain information about nationality, names and so on. Just press 'enter' and it'll be ok.
 ## Tech Stack
 Node JS/Express JS
 ES6 
